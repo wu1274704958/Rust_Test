@@ -1,4 +1,4 @@
-#![feature(nll)]
+
 mod t1;
 
 mod t2 {
@@ -54,20 +54,25 @@ mod t3 {
 mod t4 {
     use std::mem;
     use std::cell::RefCell;
-
+    use std::ptr::NonNull;
     pub fn test()
     {
         let mut a: Option<i32> = Some(8);
-
-
-        /*while let Some(ref mut n) = a {
+        let mut ptr = NonNull::new(&mut a as *mut Option<_>);
+        while let Some(ref mut n) = a {
             if *n <= 0 {
-                a = None;
+                //a = None;
+                if let Some(mut p) = ptr{
+                    let mut temp_p = unsafe {p.as_mut()};
+                    *temp_p = None;
+                }
+                break;
             } else {
                 *n -= 1;
             }
-            println!("{:?}", a);
-        }*/
+        }
+
+        println!("{:?}", a);
     }
 }
 
@@ -139,12 +144,6 @@ mod t7{
             T7{data:d}
         }
     }
-    //impl Copy for T7{}   Copy not allowed on types with destructors
-    impl Drop for T7{
-        fn drop(&mut self) {
-            println!("drop {}",self.data);
-        }
-    }
 
     impl Clone for T7{
         fn clone(&self)->T7{
@@ -170,7 +169,6 @@ mod t7{
 
         unsafe { println!("{}",getpid());}
         unsafe { system("pause".as_ptr() as *const i8 );}
-
     }
 }
 
@@ -189,10 +187,9 @@ mod t8{
         *t2 = temp;
     }
 
-    fn adjustHeap<T>(now_i : usize,len:usize,arr:&mut [T])
+    fn adjust_heap<T>(mut now_i : usize,len:usize,arr:&mut [T])
     where T: Sized + Clone + PartialOrd
     {
-        let mut now_i = now_i;
         let temp = arr[now_i].clone();
         let mut k : usize;
         k = now_i * 2 + 1;
@@ -210,13 +207,13 @@ mod t8{
         arr[now_i] = temp;
     }
 
-    fn heapSort<T>(arr:&mut [T])
+    fn heap_sort<T>(arr:&mut [T])
         where T: Sized + Clone + PartialOrd + Display
     {
         let mut i = arr.len() / 2 - 1;
         loop{
             //printHeap(&arr);
-            adjustHeap(i,arr.len(),arr);
+            adjust_heap(i,arr.len(),arr);
             if i == 0{break;}
             i -= 1;
         }
@@ -225,13 +222,13 @@ mod t8{
            // printHeap(&arr);
             unsafe {swap(&mut arr[0] ,&mut arr[j])};
             //printHeap(&arr);
-            adjustHeap(0,j,arr);
+            adjust_heap(0,j,arr);
             if j == 0{break;}
             j -= 1;
         }
     }
 
-    fn printHeap<T>(arr:&[T])
+    fn print_heap<T>(arr:&[T])
     where T:Display
     {
         let mut j:i32 = 1;
@@ -248,7 +245,7 @@ mod t8{
         let mut now = 0usize;
         for m in 0..lines{
             for n in 0..spaces{
-                print!("\t");
+                print!("     ");
             }
             for n in 0..ns{
                 if now >= arr.len(){
@@ -257,7 +254,7 @@ mod t8{
                 print!("{:^5}",arr[now]);
 
                 for s in 0..mid_spaces{
-                    print!("\t");
+                    print!("     ");
                 }
                 now = now + 1;
             }
@@ -270,13 +267,225 @@ mod t8{
     pub fn test()
     {
         let mut a = [5,2,9,4,3,1,8,6];
-        heapSort(&mut a);
-        printHeap(&a);
-       // println!("{:?}",a);
+        print_heap(&a);
+        heap_sort(&mut a);
+        print_heap(&a);
+        //println!("{:?}",a);
     }
 }
 
-fn main() {
+mod t9{
+    use std::any::TypeId;
+    use std::any::Any;
+    use std::string::String;
+    use std::mem::transmute;
 
-    t8::test();
+    fn kkk(t:&Any)
+    {
+        println!("{}",t.is::<i32>());
+    }
+
+    struct PP{
+        p:i32,
+        s:&'static str
+    }
+
+    trait A{
+        fn a(&self);
+    }
+
+    impl A for PP{
+        fn a(&self){
+            println!("{}",self.s);
+        }
+    }
+
+    impl PP{
+        pub fn pp(&mut self,n_s:&'static str){
+            self.s = n_s;
+            println!(" p = {}",self.p);
+        }
+    }
+
+    pub fn test()
+    {
+        let a : Box<_> = Box::new(PP{p:7,s:"sssss"});
+        (*a).a();
+
+        let mut b = unsafe{ transmute::<&Box<_>,*const Box<PP>>(&a) as *mut Box<PP> };
+        unsafe { (**b).pp("aaaaa");}
+
+        (*a).a();
+
+        /*let mut a = String::from("ssss");
+        let b = 2;
+        kkk(&b);
+        println!("{}",a);*/
+
+        let a_any : &Any = &a;
+        println!("{}",a_any.is::<Box<PP>>());
+
+    }
+}
+
+
+mod t10{
+    use std::collections::hash_map::HashMap;
+    fn func(arr:&Vec<i32>,target:i32)->(usize,usize)
+    {
+        let mut j:usize = 0;
+        let mut res:(usize,usize) = (0,0);
+        'wai: loop{
+            if j >= arr.len() - 1{ break;}
+            let mut i:usize = j + 1;
+            'nei: loop{
+                if i >= arr.len(){ break;}
+                if arr[i] + arr[j] == target{
+                    res.0 = i;
+                    res.1 = j;
+                    break 'wai;
+                }
+                i += 1;
+            }
+            j += 1;
+        }
+        return res;
+    }
+    fn func2(arr:&Vec<i32>,target:i32)->(usize,usize)
+    {
+        let mut j:usize = 0;
+        let mut res:(usize,usize) = (0,0);
+        let mut map:HashMap<i32,usize> = HashMap::new();
+        loop{
+            if !(j < arr.len()){ break;}
+            let other = target - arr[j];
+            if map.contains_key(&other) {
+                if let Some(v) = map.get(&other) {
+                    res.0 = v.clone();
+                    res.1 = j;
+                }
+                break;
+            }
+            map.insert(arr[j],j);
+            j += 1;
+        }
+        return res;
+    }
+    fn run<T>(f:T) ->()
+    where T: Fn(&Vec<i32>,i32)->(usize,usize)
+    {
+        let target = 9;
+        let arr = vec![2,7,11,15];
+        let res = f(&arr,target);
+        assert_eq!(arr[res.0] + arr[res.1] , target,"断言失败！{}",target);
+
+        let target = 22;
+        let res = f(&arr,target);
+        assert_eq!(arr[res.0] + arr[res.1] , target,"断言失败！{}",target);
+    }
+    pub fn test()
+    {
+        run(func2);
+    }
+}
+
+mod t11{
+    use std::ptr::NonNull;
+    struct ListNode {
+        pub val: u32,
+        pub next: Option<Box<ListNode>>
+    }
+    impl ListNode{
+        pub fn new(val:u32,next:Option<Box<ListNode>>) ->ListNode{
+            ListNode{val,next}
+        }
+        pub fn as_ptr(&self)-> *mut ListNode{
+            self as *const ListNode as *mut ListNode
+        }
+        pub fn print(&self){
+            let mut ptr:*const ListNode = self as *const ListNode;
+            print!("{}",self.val);
+            unsafe {
+                while let Some(ref p) = (*ptr).next {
+                    let temp = unsafe { p.as_ref() };
+                    print!(",{}",temp.val);
+                    ptr = temp as *const ListNode;
+                }
+            }
+        }
+    }
+
+    fn func(n1:&ListNode,n2:&ListNode)-> ListNode
+    {
+        let mut res:ListNode = ListNode::new(0,None);
+        let mut ptr_res = &mut res as *mut ListNode;
+        let mut p1 = n1 as *const ListNode;
+        let mut p2 = n2 as *const ListNode;
+        let mut jw = false;
+        unsafe {
+            loop {
+                let a = if p1.is_null() { 0 } else { (*p1).val };
+                let b = if p2.is_null() { 0 } else { (*p2).val };
+                let mut c = if jw {
+                    jw = false;
+                    a + b + 1
+                } else { a + b };
+                if c > 9 {
+                    jw = true;
+                    c -= 10;
+                }
+                (*ptr_res).val = c;
+                if !p1.is_null() {
+                    p1 = if let Some(ref next) = (*p1).next {
+                        next.as_ref() as *const ListNode
+                    } else {
+                        0 as *const ListNode
+                    };
+                }
+                if !p2.is_null() {
+                    p2 = if let Some(ref next) = (*p2).next {
+                        next.as_ref() as *const ListNode
+                    } else {
+                        0 as *const ListNode
+                    };
+                }
+                if !p1.is_null() || !p2.is_null() {
+                    let temp = Box::new(ListNode::new(0, None));
+                    let temp_ptr = temp.as_ptr();
+                    (*ptr_res).next = Some(temp);
+                    ptr_res = temp_ptr;
+                } else {
+                    break;
+                }
+            }
+            if jw{
+                (*ptr_res).next = Some(Box::new(ListNode::new(1, None)));
+            }
+        }
+        return res;
+    }
+
+    pub fn test()
+    {
+        let mut n1 = ListNode::new(2,
+                                   Some(Box::new(ListNode::new(4,
+                                   Some(Box::new(ListNode::new(3,
+                                   Some(Box::new(ListNode::new(2,None
+                                   ))))))))));
+
+        let mut n2 = ListNode::new(5,
+                                   Some(Box::new(ListNode::new(6,
+                                                               Some(Box::new(ListNode::new(4,None
+                                   )))))));
+        n1.print();println!();
+        n2.print();println!();
+        let res= func(&n1,&n2);
+        res.print();
+    }
+}
+
+
+
+fn main() {
+    t11::test();
 }
