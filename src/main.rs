@@ -1,14 +1,15 @@
-
+#![allow(non_snake_case)]
+#[allow(dead_code)]
 mod t1;
-
+#[allow(dead_code)]
 mod t2 {
     use std::mem;
 
     fn test()
     {
-        let mut k = "你好";
+        let k = "你好";
 
-        let mut kk = &k[0..3];
+        let kk = &k[0..3];
         println!("size = {}", kk.len());
 
         let kkk = '你';
@@ -16,7 +17,7 @@ mod t2 {
         println!("kkk  size = {}", mem::size_of_val(&kkk));
 
         unsafe {
-            let mut p = mem::transmute::<&char, *const u8>(&kkk);// as *const u8;
+            let p = mem::transmute::<&char, *const u8>(&kkk);// as *const u8;
 
             for i in 0..4 {
                 print!("{} ", *(p.offset(i as isize)));
@@ -24,7 +25,7 @@ mod t2 {
         }
         println!("{}", kkk);
         unsafe {
-            let mut p = kk.as_ptr() as *const u8;
+            let p = kk.as_ptr() as *const u8;
 
             for i in 0..kk.len() {
                 print!("{} ", *(p.offset(i as isize)));
@@ -33,14 +34,14 @@ mod t2 {
         println!("{}", kk);
     }
 }
-
+#[allow(dead_code)]
 mod t3 {
     #[derive(Debug)]
     struct Digit(i32);
 
     pub fn test()
     {
-        let mut v = vec![1, 2, 3];
+        let v = vec![1, 2, 3];
         let mut v: Vec<Digit> = v.into_iter().map(|it: i32| { Digit(it) }).collect();
 
         v.iter_mut().for_each(|it: &mut Digit| {
@@ -50,15 +51,13 @@ mod t3 {
         println!("{:?}", v);
     }
 }
-
+#[allow(dead_code)]
 mod t4 {
-    use std::mem;
-    use std::cell::RefCell;
     use std::ptr::NonNull;
     pub fn test()
     {
         let mut a: Option<i32> = Some(8);
-        let mut ptr = NonNull::new(&mut a as *mut Option<_>);
+        let ptr = NonNull::new(&mut a as *mut Option<_>);
         while let Some(ref mut n) = a {
             if *n <= 0 {
                 //a = None;
@@ -75,9 +74,8 @@ mod t4 {
         println!("{:?}", a);
     }
 }
-
+#[allow(dead_code)]
 mod t5 {
-    use std::mem;
 
     trait Test {
         fn tefun(&self) {
@@ -105,11 +103,12 @@ mod t5 {
     pub fn test()
     {
         let a = Box::new(Stru { a: 1, b: 2, c: 6 });
-        let b = unsafe{a as Box<Test>};
+        let b = a as Box<Test>;
         func(b.as_ref());
     }
 }
-
+#[allow(unused_assignments)]
+#[allow(dead_code)]
 mod t6 {
     pub fn test()
     {
@@ -120,8 +119,8 @@ mod t6 {
     }
 }
 
-
-
+#[allow(dead_code)]
+#[allow(unused_assignments)]
 mod t7{
     use std::fmt::Display;
     use std::fmt::Formatter;
@@ -129,7 +128,6 @@ mod t7{
     use t1::libc::system;
     use t1::libc::getpid;
     use std::clone::Clone;
-    use std::marker::Copy;
     use std::mem;
     use std::cell::*;
 
@@ -159,7 +157,7 @@ mod t7{
     pub fn test()
     {
         let mut a = T7::new(4);
-        let mut b = T7::new(9);
+        let b = T7::new(9);
         a = b.clone();
         println!("{}",a);
         println!("{}",b);
@@ -171,12 +169,10 @@ mod t7{
         unsafe { system("pause".as_ptr() as *const i8 );}
     }
 }
-
+#[allow(dead_code)]
 mod t8{
 
     use std::clone::Clone;
-    use std::marker::Copy;
-    use std::cmp::PartialEq;
     use std::fmt::Display;
 
     unsafe fn swap<T>(t1:*mut T,t2:*mut T)
@@ -243,17 +239,17 @@ mod t8{
         let mut mid_spaces = 0;
         let mut ns = 1;
         let mut now = 0usize;
-        for m in 0..lines{
-            for n in 0..spaces{
+        for _m in 0..lines{
+            for _n in 0..spaces{
                 print!("     ");
             }
-            for n in 0..ns{
+            for _n in 0..ns{
                 if now >= arr.len(){
                     break;
                 }
                 print!("{:^5}",arr[now]);
 
-                for s in 0..mid_spaces{
+                for _s in 0..mid_spaces{
                     print!("     ");
                 }
                 now = now + 1;
@@ -273,11 +269,9 @@ mod t8{
         //println!("{:?}",a);
     }
 }
-
+#[allow(dead_code)]
 mod t9{
-    use std::any::TypeId;
     use std::any::Any;
-    use std::string::String;
     use std::mem::transmute;
 
     fn kkk(t:&Any)
@@ -312,7 +306,7 @@ mod t9{
         let a : Box<_> = Box::new(PP{p:7,s:"sssss"});
         (*a).a();
 
-        let mut b = unsafe{ transmute::<&Box<_>,*const Box<PP>>(&a) as *mut Box<PP> };
+        let b = unsafe{ transmute::<&Box<_>,*const Box<PP>>(&a) as *mut Box<PP> };
         unsafe { (**b).pp("aaaaa");}
 
         (*a).a();
@@ -328,7 +322,7 @@ mod t9{
     }
 }
 
-
+#[allow(dead_code)]
 mod t10{
     use std::collections::hash_map::HashMap;
     fn func(arr:&Vec<i32>,target:i32)->(usize,usize)
@@ -388,9 +382,12 @@ mod t10{
         run(func2);
     }
 }
-
+#[allow(dead_code)]
 mod t11{
-    use std::ptr::NonNull;
+    use std::cmp::PartialEq;
+    use std::fmt::Debug;
+    use std::fmt::Formatter;
+    use std::fmt::Error;
     struct ListNode {
         pub val: u32,
         pub next: Option<Box<ListNode>>
@@ -402,16 +399,47 @@ mod t11{
         pub fn as_ptr(&self)-> *mut ListNode{
             self as *const ListNode as *mut ListNode
         }
-        pub fn print(&self){
+    }
+
+    impl PartialEq for ListNode{
+        fn eq(&self, other: &ListNode) -> bool {
+            let mut p1 = self as *const ListNode;
+            let mut p2 = other as *const ListNode;
+            let mut res = true;
+            unsafe {
+                loop {
+                    if p1.is_null() && p2.is_null(){ break;}
+                    if p1.is_null() || p2.is_null(){ res = false;break;}
+                    if (*p1).val != (*p2).val{
+                        res = false;
+                    }
+                    p1 = if let Some(ref ptr) = (*p1).next{
+                        ptr.as_ptr()
+                    }else{
+                        0 as *const ListNode
+                    };
+                    p2 = if let Some(ref ptr) = (*p2).next{
+                        ptr.as_ptr()
+                    }else{
+                        0 as *const ListNode
+                    };
+                }
+            }
+            res
+        }
+    }
+    impl Debug for ListNode{
+        fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
             let mut ptr:*const ListNode = self as *const ListNode;
-            print!("{}",self.val);
+            write!(f,"{}",self.val);
             unsafe {
                 while let Some(ref p) = (*ptr).next {
-                    let temp = unsafe { p.as_ref() };
-                    print!(",{}",temp.val);
+                    let temp =  p.as_ref() ;
+                    write!(f,",{}",temp.val);
                     ptr = temp as *const ListNode;
                 }
             }
+            Ok(())
         }
     }
 
@@ -462,25 +490,32 @@ mod t11{
                 (*ptr_res).next = Some(Box::new(ListNode::new(1, None)));
             }
         }
-        return res;
+        res
     }
 
     pub fn test()
     {
-        let mut n1 = ListNode::new(2,
+        let n1 = ListNode::new(2,
                                    Some(Box::new(ListNode::new(4,
                                    Some(Box::new(ListNode::new(3,
                                    Some(Box::new(ListNode::new(2,None
                                    ))))))))));
 
-        let mut n2 = ListNode::new(5,
+        let n2 = ListNode::new(5,
                                    Some(Box::new(ListNode::new(6,
-                                                               Some(Box::new(ListNode::new(4,None
+                                   Some(Box::new(ListNode::new(4,None
                                    )))))));
-        n1.print();println!();
-        n2.print();println!();
+
+        let n3 = ListNode::new(7,
+                                   Some(Box::new(ListNode::new(0,
+                                   Some(Box::new(ListNode::new(8,
+                                   Some(Box::new(ListNode::new(2,None
+                                   ))))))))));
+        println!("{:?}",n1);
+        println!("{:?}",n2);
         let res= func(&n1,&n2);
-        res.print();
+        println!("{:?}",res);
+        assert_eq!(res,n3,"断言失败！");
     }
 }
 

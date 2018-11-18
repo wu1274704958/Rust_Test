@@ -1,9 +1,7 @@
 pub extern crate libc;
 
-use super::std::fmt::Display;
 use super::std::fmt::Debug;
 use super::std::fmt::Formatter;
-use super::std::string;
 use super::std::fmt;
 
 struct Pair<K, V> {
@@ -37,7 +35,7 @@ fn show<T>(t: &T)
 
 pub fn test1() {
     let pair = Pair { key: 5, val: 7 };
-    let mut pair_ptr = Box::new(Pair {
+    let pair_ptr = Box::new(Pair {
         key: "hhjhj",
         val: "jshjdhsaj",
     });
@@ -79,12 +77,10 @@ pub fn test3() {
     println!("{}", mem::size_of_val(&m));
 }
 
-use std::collections::HashMap;
-
 
 pub fn test4()
 {
-    let mut a = Pair { key: 1, val: 3 };
+    let a = Pair { key: 1, val: 3 };
     let b = a.doing();
     match b {
         Ok(ref x) => println!("Ok key = {}", x),
@@ -108,7 +104,7 @@ pub fn test5()
 {
     let a = 4;
     let b = 8;
-    let aa = 9;
+    let _aa = 9;
 
     let c = || {
         a + b
