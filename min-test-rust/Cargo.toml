@@ -1,0 +1,8 @@
+[package]
+edition = "2018"
+name = "min-test-rust"
+version = "0.1.0"
+authors = ["wusj7856 <wusj@realbull.net>"]
+
+[dependencies]
+test1 = { path="./test1"}

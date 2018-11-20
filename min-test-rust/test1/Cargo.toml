@@ -1,0 +1,13 @@
+[package]
+edition = "2018"
+name = "test1"
+version = "0.1.0"
+authors = ["wusj7856 <wusj@realbull.net>"]
+
+[lib]
+proc_macro = true
+
+[dependencies]
+quote = "0.6"
+syn = "0.15"
+proc-macro2="0.4"
