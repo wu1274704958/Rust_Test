@@ -2,6 +2,7 @@
 use std::ptr::NonNull;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hasher;
+use std::any::{ Any,TypeId};
 
 extern crate test1;
 use test1::New;
@@ -79,13 +80,13 @@ macro_rules! ergodic {
     };
 
     (#(#$f:ident)*) =>{
-        $f.iter().enumerate().for_each(|it|{
-            println!("{} {}",it.0,it.1);
+        $f.iter().for_each(|it|{
+            println!("{}",it);
         });
     };
     (#(#$f:ident),*) =>{
-        $f.iter().enumerate().for_each(|it|{
-            print!("{} {},",it.0,it.1);
+        $f.iter().for_each(|it|{
+            print!("{},",it);
         });
     };
 }
@@ -99,13 +100,45 @@ macro_rules! gibberish {
 }
 
 macro_rules! pki {
-    ($ss:ident $f:tt) => {
-        $ss.insert_str(0,stringify!($f));
+    ($ss:ident { $($f:tt)* } $($t:tt)* ) =>{
+        $ss.push('{');
+        {
+            let inner = my_pki!($($f)*);
+            $ss.insert_str($ss.len(),inner.as_str());
+        }
+        $ss.push('}');
+        pki!($ss $($t)*);
     };
 
-    ($ss:ident $f:tt $($t:tt)*) => {
+    ($ss:ident ( $($f:tt)* ) $($t:tt)* ) =>{
+        $ss.push('(');
+        {
+            let inner = my_pki!($($f)*);
+            $ss.insert_str($ss.len(),inner.as_str());
+        }
+        $ss.push(')');
         pki!($ss $($t)*);
-        $ss.insert_str(0,format!("{} ",stringify!($f) ).as_str() );
+    };
+
+    ($ss:ident # $f:ident $($t:tt)*) => {
+        if $crate::is_str(&$f)
+        {
+            $ss.insert_str($ss.len(),format!("\"{}\" ",$f ).as_str());
+        }else{
+            $ss.insert_str($ss.len(),format!("{} ",$f ).as_str());
+        }
+        pki!($ss $($t)*);
+    };
+
+    ($ss:ident $f:tt) => {
+        $ss.insert_str($ss.len(),stringify!($f));
+    };
+
+    ($ss:ident) => {};
+
+    ($ss:ident $f:tt $($t:tt)*) => {
+        $ss.insert_str($ss.len(),format!("{} ",stringify!($f) ).as_str() );
+        pki!($ss $($t)*);
     };
 }
 
@@ -118,6 +151,12 @@ macro_rules! my_pki {
             ss
         }
     };
+}
+
+
+fn is_str(t:&Any) ->bool
+{
+    t.is::<String>()
 }
 
 fn main() {
@@ -135,16 +174,17 @@ fn main() {
     println!();
     gibberish!(impl k);
 
+    let struct_name = "KKK";
+    let nn:String = String::from("hello");
+
     let ooo = my_pki!{
-        impl Hello for kkk{
+        impl Hello for #struct_name{
             fn hello()
             {
-               println!("hello");
+               println!(#nn);
             }
         }
     };
-
     println!("ooo = {}",ooo);
-
     s.new();
 }
