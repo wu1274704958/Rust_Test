@@ -36,7 +36,7 @@ fn test2(){
 }
 
 #[derive(New)]
-struct yy{
+struct Yy{
     a:i32,
     b:i32,
     c:u32
@@ -98,9 +98,31 @@ macro_rules! gibberish {
     (impl $t:tt ) => { println!("impl"); };
 }
 
+macro_rules! pki {
+    ($ss:ident $f:tt) => {
+        $ss.insert_str(0,stringify!($f));
+    };
+
+    ($ss:ident $f:tt $($t:tt)*) => {
+        pki!($ss $($t)*);
+        $ss.insert_str(0,format!("{} ",stringify!($f) ).as_str() );
+    };
+}
+
+macro_rules! my_pki {
+
+    ($($t:tt)*) => {
+        {
+            let mut ss = String::new();
+            pki!(ss $($t)*);
+            ss
+        }
+    };
+}
+
 fn main() {
     //mm!(9+8);
-    let s = yy{a:7,b:9,c:900};
+    let s = Yy{a:7,b:9,c:900};
     let v = vec![1,2,3];
     let a = 1;
     let b = 2;
@@ -112,6 +134,17 @@ fn main() {
 
     println!();
     gibberish!(impl k);
+
+    let ooo = my_pki!{
+        impl Hello for kkk{
+            fn hello()
+            {
+               println!("hello");
+            }
+        }
+    };
+
+    println!("ooo = {}",ooo);
 
     s.new();
 }
