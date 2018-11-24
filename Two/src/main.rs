@@ -518,9 +518,59 @@ mod t11{
         assert_eq!(res,n3,"断言失败！");
     }
 }
+mod t12{
 
+    use std::cmp::{max,min};
 
+    fn findMedianSortedArrays(mut arr1: Vec<i32>,mut arr2:Vec<i32>) -> f64
+    {
+        let mut m = arr1.len();
+        let mut n = arr2.len();
+        if m > n{ //swap let m <= n
+            let temp = arr1;
+            arr1 = arr2;
+            arr2 = temp;
+            let tmp = m;
+            m = n;
+            n = tmp;
+        }
+        let mut min_i = 0usize;
+        let mut max_i = m;
+        let half_len = (m + n + 1)/ 2;
+        while min_i <= max_i{
+            let i = (min_i + max_i) / 2;
+            let j = half_len - i;
+            if i < max_i && arr2[j - 1] > arr1[i]{
+                min_i = i + 1;
+            }else if i > min_i && arr1[i - 1] > arr2[j]{
+                max_i = i - 1;
+            }else {
+                let max_left = if i == 0{
+                    arr2[j - 1] as f64
+                }else if j == 0 {
+                    arr1[i - 1] as f64
+                }else{
+                    max(arr1[i - 1],arr2[j - 1]) as f64
+                };
+                if (m + n) % 2 == 1{ return max_left;}
+                let min_right = if i == m{
+                    arr2[j] as f64
+                }else if j == n {
+                    arr1[i] as f64
+                }else{
+                    min(arr1[i],arr2[j]) as f64
+                };
+                return (max_left + min_right) / 2.0;
+            }
+        }
+        0.0
+    }
+    pub fn test(){
+        assert_eq!( findMedianSortedArrays(vec![1,2],vec![3,4]),2.5 ,"assert failed!");
+        assert_eq!( findMedianSortedArrays(vec![1,3],vec![2]),2.0 ,"assert failed!");
+    }
+}
 
 fn main() {
-    t11::test();
+    t12::test();
 }
