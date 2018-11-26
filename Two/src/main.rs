@@ -1,6 +1,9 @@
 #![allow(non_snake_case)]
 #[allow(dead_code)]
 mod t1;
+
+mod tup_macro;
+
 #[allow(dead_code)]
 mod t2 {
     use std::mem;
@@ -121,6 +124,7 @@ mod t6 {
 
 #[allow(dead_code)]
 #[allow(unused_assignments)]
+#[allow(unused_must_use)]
 mod t7{
     use std::fmt::Display;
     use std::fmt::Formatter;
@@ -321,7 +325,7 @@ mod t9{
 
     }
 }
-
+#[cfg(test)]
 #[allow(dead_code)]
 mod t10{
     use std::collections::hash_map::HashMap;
@@ -377,12 +381,15 @@ mod t10{
         let res = f(&arr,target);
         assert_eq!(arr[res.0] + arr[res.1] , target,"断言失败！{}",target);
     }
+    #[test]
     pub fn test()
     {
         run(func2);
     }
 }
 #[allow(dead_code)]
+#[allow(unused_must_use)]
+#[cfg(test)]
 mod t11{
     use std::cmp::PartialEq;
     use std::fmt::Debug;
@@ -492,7 +499,7 @@ mod t11{
         }
         res
     }
-
+    #[test]
     pub fn test()
     {
         let n1 = ListNode::new(2,
@@ -518,6 +525,7 @@ mod t11{
         assert_eq!(res,n3,"断言失败！");
     }
 }
+#[cfg(test)]
 mod t12{
 
     use std::cmp::{max,min};
@@ -565,6 +573,7 @@ mod t12{
         }
         0.0
     }
+    #[test]
     pub fn test(){
         assert_eq!( findMedianSortedArrays(vec![1,2],vec![3,4]),2.5 ,"assert failed!");
         assert_eq!( findMedianSortedArrays(vec![1,3],vec![2]),2.0 ,"assert failed!");
@@ -572,5 +581,8 @@ mod t12{
 }
 
 fn main() {
+    let mut tup = (1,2);
+    tup_get!(tup,0) = 9;
+    println!("{}",tup_get!(tup,0));
     t12::test();
 }
