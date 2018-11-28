@@ -525,7 +525,8 @@ mod t11{
         assert_eq!(res,n3,"断言失败！");
     }
 }
-#[cfg(test)]
+#[allow(dead_code)]
+#[allow(unused_must_use)]
 mod t12{
 
     use std::cmp::{max,min};
@@ -573,16 +574,49 @@ mod t12{
         }
         0.0
     }
-    #[test]
+
     pub fn test(){
         assert_eq!( findMedianSortedArrays(vec![1,2],vec![3,4]),2.5 ,"assert failed!");
         assert_eq!( findMedianSortedArrays(vec![1,3],vec![2]),2.0 ,"assert failed!");
     }
 }
 
+mod t13{
+
+    fn convert(s:&Vec<u8>,r:usize) -> Vec<u8>
+    {
+        if r == 1 { return s.clone(); }
+        let cycle_len = r * 2 - 2;
+        let mut ret:Vec<u8> = Vec::new();
+        let len = s.len();
+
+        let mut i = 0usize;
+        loop {
+            if i >= r {break;}
+            let mut j = 0usize;
+            loop {
+                if j + i >= len {break;}
+                ret.push( s[j + i]);
+                if i != 0 && i != r - 1 && j + cycle_len - i < len{
+                    ret.push(s[j + cycle_len - i]);
+                }
+                j += cycle_len;
+            }
+            i += 1;
+        }
+        ret
+    }
+
+    pub fn test(){
+        //a e i
+        //bdfh
+        //c g
+        assert_eq!( convert(    &vec![b'A',b'B',b'C',b'D',b'E',b'F',b'G',b'H',b'I'],3),
+                                    vec![b'A',b'E',b'I',b'B',b'D',b'F',b'H',b'C',b'G'] ,"assert failed!");
+    }
+}
+
 fn main() {
-    let mut tup = (1,2);
-    tup_get!(tup,0) = 9;
-    println!("{}",tup_get!(tup,0));
-    t12::test();
+
+    t13::test();
 }
