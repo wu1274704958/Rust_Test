@@ -1,5 +1,11 @@
 #include "test_dll.h"
-#include <iostream>
+#include <stdio.h>
+
 int say_hello(int a){
-    return a + 1;
+    return a << 1;
+}
+
+void call_printf()
+{
+    printf("hello\n");
 }

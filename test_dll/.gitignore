@@ -1,1 +1,6 @@
-build/
+build/*.dll
+build/*.a
+build/*.cmake
+build/CMakeFiles
+build/Makefile
+build/*.txt
