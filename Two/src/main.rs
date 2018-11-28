@@ -625,7 +625,7 @@ mod t14{
     #[link(name = "test_dll")]
     extern "C" {
         fn say_hello(a:c_int) ->c_int;
-        fn call_printf()-> c_void;
+        fn call_printf(a:c_int)-> c_void;
     }
 
     pub fn test()
@@ -633,7 +633,7 @@ mod t14{
         unsafe {
             println!("{}",say_hello(9));
 
-            //call_printf();
+            call_printf(9);
         }
     }
 }
