@@ -6,6 +6,7 @@ use std::any::{ Any,TypeId};
 
 extern crate test1;
 use test1::New;
+use test1::route;
 
 fn test1(){
     let mut a = 90;
@@ -159,7 +160,8 @@ fn is_str(t:&Any) ->bool
     t.is::<String>()
 }
 
-fn main() {
+fn test3()
+{
     //mm!(9+8);
     let s = Yy{a:7,b:9,c:900};
     let v = vec![1,2,3];
@@ -187,4 +189,14 @@ fn main() {
     };
     println!("ooo = {}",ooo);
     s.new();
+}
+
+#[route(GET, "/")]
+fn func()
+{
+
+}
+
+fn main() {
+    test3();
 }

@@ -9,7 +9,7 @@ mod tests {
 }
 
 use {
-    syn::{parse_macro_input,Token,DeriveInput},
+    syn::{parse_macro_input,Token,DeriveInput,AttributeArgs},
     quote::*,
     proc_macro2,
     self::proc_macro::TokenStream
@@ -54,3 +54,23 @@ fn impl_new(ast:&DeriveInput, field:&syn::Fields) -> proc_macro2::TokenStream
         }
     }
 }
+
+
+use syn::NestedMeta::{Meta,Literal};
+#[proc_macro_attribute]
+pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let ast:AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+
+    ast.iter().for_each(|it| {
+        match *it {
+            Meta(ref meta) => {
+            },
+            Literal(ref lit) => {
+            }
+        }
+    });
+
+    let ret = quote!{};
+    ret.into()
+}
+
