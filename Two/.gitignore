@@ -2,3 +2,5 @@
 /.vs
 /.project
 /target
+/*.dll
+/*.exe

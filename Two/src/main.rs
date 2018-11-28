@@ -616,7 +616,23 @@ mod t13{
     }
 }
 
+mod t14{
+    use t1::libc::c_int;
+
+    #[link(name = "test_dll")]
+    extern {
+        fn say_hello(a:c_int) ->c_int;
+    }
+
+    pub fn test()
+    {
+        unsafe {
+            println!("{}",say_hello(9));
+        }
+    }
+}
+
 fn main() {
 
-    t13::test();
+    t14::test();
 }
