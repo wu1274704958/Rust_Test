@@ -617,9 +617,11 @@ mod t13{
     }
 }
 
+#[cfg(target_os="windows")]
 mod t14{
     use t1::libc::{c_int,c_void};
 
+    #[allow(dead_code)]
     #[link(name = "test_dll")]
     extern "C" {
         fn say_hello(a:c_int) ->c_int;
@@ -629,14 +631,15 @@ mod t14{
     pub fn test()
     {
         unsafe {
-            //println!("{}",say_hello(9));
+            println!("{}",say_hello(9));
 
-            call_printf();
+            //call_printf();
         }
     }
 }
 
 fn main() {
-
-    t14::test();
+    if cfg!(target_os = "windows") {
+        t14::test();
+    }
 }
