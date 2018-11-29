@@ -10,7 +10,7 @@ use std::any::{ Any,TypeId};
 extern crate test1;
 use test1::New;
 use test1::route;
-use test1::hashmap;
+use test1::def_const;
 
 fn test1(){
     let mut a = 90;
@@ -200,7 +200,9 @@ fn func2()
 {
 
 }
-//not stable
+
+def_const!{ aa => 2 }
+//not stable procedural macros cannot be expanded to expressions (see issue #54727)
 //fn test4(){
 //    let hm = hashmap!{ { "a" => 1,"b" => 2,"c" => 3 } };
 //    assert_eq!(hm["c"], 3);
@@ -211,4 +213,5 @@ fn func2()
 fn main() {
     test3();
     func2();
+    println!("{}",aa);
 }
