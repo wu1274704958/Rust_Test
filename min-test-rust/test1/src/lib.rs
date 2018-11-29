@@ -1,3 +1,5 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
 extern crate proc_macro;
 
 #[cfg(test)]
@@ -57,20 +59,52 @@ fn impl_new(ast:&DeriveInput, field:&syn::Fields) -> proc_macro2::TokenStream
 
 
 use syn::NestedMeta::{Meta,Literal};
+use syn::Meta::{Word,List,NameValue};
+use syn::Lit::*;
 #[proc_macro_attribute]
 pub fn route(attr: TokenStream, item: TokenStream) -> TokenStream {
     let ast:AttributeArgs = parse_macro_input!(attr as AttributeArgs);
+    let last_n = ast.len() - 1;
 
-    ast.iter().for_each(|it| {
-        match *it {
+    let mut str = String::new();
+    str.push('(');
+    ast.iter().enumerate().for_each(|it| {
+        match *(it.1) {
             Meta(ref meta) => {
+                match *meta {
+                    Word(ref ident) =>{
+                        str.insert_str(str.len(),ident.into_token_stream().to_string().as_str());
+                    },
+                    List(ref list) =>{
+                        println!("List");
+                    },
+                    NameValue(ref name_value) =>{
+                        println!("NameValue");
+                    }
+                };
             },
             Literal(ref lit) => {
+
+                match *lit {
+                    Str(ref s ) =>{
+                        str.push('"');
+                        str.push_str(s.value().as_str());
+                        str.push('"');
+                    },
+                    _ => {
+                        str.push_str("Others");
+                    }
+                }
+
             }
         }
+        if it.0 < last_n{
+            str.push(',');
+        }
     });
-
-    let ret = quote!{};
+    str.push(')');
+    let ret = quote!{ fn func(){ println!("{}",#str); } };
+    println!("{}",ret);
     ret.into()
 }
 

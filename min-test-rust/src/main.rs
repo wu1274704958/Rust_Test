@@ -1,4 +1,7 @@
-
+#![allow(unused_imports)]
+#![allow(unused_macros)]
+#![allow(unused_mut)]
+#![allow(dead_code)]
 use std::ptr::NonNull;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hasher;
@@ -191,7 +194,7 @@ fn test3()
     s.new();
 }
 
-#[route(GET, "/")]
+#[route(GET, "/",true)]
 fn func()
 {
 
@@ -199,4 +202,5 @@ fn func()
 
 fn main() {
     test3();
+    func();
 }
