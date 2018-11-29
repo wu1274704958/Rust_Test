@@ -126,11 +126,11 @@ macro_rules! pki {
     };
 
     ($ss:ident # $f:ident $($t:tt)*) => {
-        if $crate::is_str(&$f)
+        if $crate::is_string(&$f)
         {
-            $ss.insert_str($ss.len(),format!("\"{}\" ",$f ).as_str());
+            $ss.push_str(format!("{} ",$f ).as_str());
         }else{
-            $ss.insert_str($ss.len(),format!("{} ",$f ).as_str());
+            $ss.push_str(format!("\"{}\" ",$f ).as_str());
         }
         pki!($ss $($t)*);
     };
@@ -141,10 +141,22 @@ macro_rules! pki {
 
     ($ss:ident) => {};
 
+    ($ss:ident #(#$v:tt)* ) => {
+        $v.iter().for_each(|it|{
+           if $crate::is_string(it){
+                $ss.push_str(it.as_str());
+           }else{
+                $ss.push_str( format!("\"{}\"",it).as_str() );
+           }
+        });
+    };
+
     ($ss:ident $f:tt $($t:tt)*) => {
         $ss.insert_str($ss.len(),format!("{} ",stringify!($f) ).as_str() );
         pki!($ss $($t)*);
     };
+
+
 }
 
 macro_rules! my_pki {
@@ -159,7 +171,7 @@ macro_rules! my_pki {
 }
 
 
-fn is_str(t:&Any) ->bool
+fn is_string(t:&Any) ->bool
 {
     t.is::<String>()
 }
@@ -180,14 +192,20 @@ fn test3()
     println!();
     gibberish!(impl k);
 
-    let struct_name = "KKK";
-    let nn:String = String::from("hello");
+    let struct_name = "KKK".to_string();
+    let func_name:String = String::from("hello");
+
+    let mut v:Vec<String> = Vec::new();
+    v.push(my_pki!{ println!("Hello {}",a); });
+    v.push(my_pki!{ println!("Hello {}",b); });
+    v.push(my_pki!{ println!("Hello {}",c); });
+
 
     let ooo = my_pki!{
         impl Hello for #struct_name{
-            fn hello()
+            fn #func_name()
             {
-               println!(#nn);
+               #(#v)*
             }
         }
     };
