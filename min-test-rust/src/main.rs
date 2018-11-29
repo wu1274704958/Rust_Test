@@ -10,6 +10,7 @@ use std::any::{ Any,TypeId};
 extern crate test1;
 use test1::New;
 use test1::route;
+use test1::hashmap;
 
 fn test1(){
     let mut a = 90;
@@ -195,12 +196,19 @@ fn test3()
 }
 
 #[route(GET, "/",true)]
-fn func()
+fn func2()
 {
 
 }
+//not stable
+//fn test4(){
+//    let hm = hashmap!{ { "a" => 1,"b" => 2,"c" => 3 } };
+//    assert_eq!(hm["c"], 3);
+//    let hm = hashmap!{ "a": 1, "b": 2,};
+//    assert_eq!(hm["a"], 1);
+//}
 
 fn main() {
     test3();
-    func();
+    func2();
 }
