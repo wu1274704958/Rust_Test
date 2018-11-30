@@ -685,9 +685,36 @@ mod t15{
     }
 }
 
+mod t16{
+    trait A {
+        fn foo(&self, s: &'static str);
+    }
+    struct B{
+        a:i32
+    }
+    impl A for B {
+        fn foo(&self, s: &str){
+            println!("{:?},{}", s,self.a);
+        }
+    }
+    impl B{
+        fn foo2(&self, s: &'static str){
+            println!("{:?}", s);
+        }
+    }
+    pub fn test() {
+        let b = B{ a : 9};
+        let s = "hello".to_string();
+        b.foo("hello");
+//        b.foo(&s); // error
+//        b.foo2(&s);
+
+    }
+}
+
 fn main() {
 //    if cfg!(target_os = "windows") {
 //        t14::test();
 //    }
-    t15::test();
+    t16::test();
 }
