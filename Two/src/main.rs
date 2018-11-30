@@ -1,10 +1,12 @@
 #![allow(non_snake_case)]
-#[allow(dead_code)]
+#![allow(dead_code)]
+#![allow(unused_must_use)]
+
 mod t1;
 
 mod tup_macro;
 
-#[allow(dead_code)]
+
 mod t2 {
     use std::mem;
 
@@ -37,7 +39,7 @@ mod t2 {
         println!("{}", kk);
     }
 }
-#[allow(dead_code)]
+
 mod t3 {
     #[derive(Debug)]
     struct Digit(i32);
@@ -54,7 +56,7 @@ mod t3 {
         println!("{:?}", v);
     }
 }
-#[allow(dead_code)]
+
 mod t4 {
     use std::ptr::NonNull;
     pub fn test()
@@ -77,7 +79,7 @@ mod t4 {
         println!("{:?}", a);
     }
 }
-#[allow(dead_code)]
+
 mod t5 {
 
     trait Test {
@@ -110,8 +112,8 @@ mod t5 {
         func(b.as_ref());
     }
 }
+
 #[allow(unused_assignments)]
-#[allow(dead_code)]
 mod t6 {
     pub fn test()
     {
@@ -122,9 +124,9 @@ mod t6 {
     }
 }
 
-#[allow(dead_code)]
+
+
 #[allow(unused_assignments)]
-#[allow(unused_must_use)]
 mod t7{
     use std::fmt::Display;
     use std::fmt::Formatter;
@@ -173,7 +175,7 @@ mod t7{
         unsafe { system("pause".as_ptr() as *const i8 );}
     }
 }
-#[allow(dead_code)]
+
 mod t8{
 
     use std::clone::Clone;
@@ -273,7 +275,7 @@ mod t8{
         //println!("{:?}",a);
     }
 }
-#[allow(dead_code)]
+
 mod t9{
     use std::any::Any;
     use std::mem::transmute;
@@ -326,7 +328,6 @@ mod t9{
     }
 }
 #[cfg(test)]
-#[allow(dead_code)]
 mod t10{
     use std::collections::hash_map::HashMap;
     fn func(arr:&Vec<i32>,target:i32)->(usize,usize)
@@ -387,8 +388,7 @@ mod t10{
         run(func2);
     }
 }
-#[allow(dead_code)]
-#[allow(unused_must_use)]
+
 #[cfg(test)]
 mod t11{
     use std::cmp::PartialEq;
@@ -525,8 +525,7 @@ mod t11{
         assert_eq!(res,n3,"断言失败！");
     }
 }
-#[allow(dead_code)]
-#[allow(unused_must_use)]
+
 mod t12{
 
     use std::cmp::{max,min};
@@ -580,8 +579,7 @@ mod t12{
         assert_eq!( findMedianSortedArrays(vec![1,3],vec![2]),2.0 ,"assert failed!");
     }
 }
-#[allow(dead_code)]
-#[allow(unused_must_use)]
+
 mod t13{
 
     fn convert(s:&Vec<u8>,r:usize) -> Vec<u8>
@@ -638,8 +636,85 @@ mod t14{
     }
 }
 
-fn main() {
-    if cfg!(target_os = "windows") {
-        t14::test();
+mod t15{
+    use std::mem::{ transmute , uninitialized ,forget,size_of_val};
+    use std::ptr::copy;
+
+    #[derive(Debug)]
+    enum Test {
+        A(i32),B(String)
     }
+
+
+    pub fn test() {
+        let x = Test::B("abc".to_string());
+        println!("{}",std::mem::size_of::<Test>());
+        println!("{}",std::mem::size_of::<String>());
+        let mut y: Test = unsafe { uninitialized() };
+
+        let str_ = "ssss".to_string();
+
+        unsafe {
+            let mut ptr:*mut u8 = transmute(&mut y);
+            let index = 1usize;
+            let index_ptr = transmute(&index);
+            let str_ptr = transmute(&str_);
+
+            copy(index_ptr,ptr,size_of_val(&index));
+            ptr = ptr.add(size_of_val(&index));
+            copy(str_ptr,ptr,size_of_val(&str_));
+        }
+
+/*        unsafe {
+            let mut ptr:*const u8 = transmute(&x);
+            let len = size_of_val(&x);
+            let mut i = 0;
+            loop {
+                if i >= len{break;}
+                println!("{:x}",*ptr);
+                ptr = ptr.add(1);
+                i += 1;
+            }
+        }
+*/
+        // 咋在运行时生成 B(n)
+        //println!("{:?}", x);
+        println!("{:?},{:?}", x,y);
+
+        forget(str_);
+    }
+}
+
+mod t16{
+    trait A {
+        fn foo(&self, s: &'static str);
+    }
+    struct B{
+        a:i32
+    }
+    impl A for B {
+        fn foo(&self, s: &str){
+            println!("{:?},{}", s,self.a);
+        }
+    }
+    impl B{
+        fn foo2(&self, s: &'static str){
+            println!("{:?}", s);
+        }
+    }
+    pub fn test() {
+        let b = B{ a : 9};
+        let s = "hello".to_string();
+        b.foo("hello");
+//        b.foo(&s); // error
+//        b.foo2(&s);
+
+    }
+}
+
+fn main() {
+//    if cfg!(target_os = "windows") {
+//        t14::test();
+//    }
+    t16::test();
 }

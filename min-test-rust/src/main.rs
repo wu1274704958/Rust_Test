@@ -220,6 +220,8 @@ fn func2()
 }
 
 def_const!{ aa => 2 }
+def_const!{ bb => 3 }
+def_const!{ cc => 4 }
 //not stable procedural macros cannot be expanded to expressions (see issue #54727)
 //fn test4(){
 //    let hm = hashmap!{ { "a" => 1,"b" => 2,"c" => 3 } };
@@ -228,8 +230,11 @@ def_const!{ aa => 2 }
 //    assert_eq!(hm["a"], 1);
 //}
 
-fn main() {
-    test3();
+fn test4(){
     func2();
-    println!("{}",aa);
+    println!("aa = {} bb = {} cc = {} ",aa,bb,cc);
+}
+
+fn main() {
+    test4();
 }
