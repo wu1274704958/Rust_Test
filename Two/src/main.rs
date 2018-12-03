@@ -704,17 +704,99 @@ mod t16{
     }
     pub fn test() {
         let b = B{ a : 9};
-        let s = "hello".to_string();
+        let _s = "hello".to_string();
         b.foo("hello");
-//        b.foo(&s); // error
-//        b.foo2(&s);
+//        b.foo(&_s); // error
+//        b.foo2(&_s);
 
+    }
+}
+
+mod t17{
+    use std::fmt::{ Display,Formatter,Error};
+
+    #[derive(Clone,Copy)]
+    struct Vec2{
+        x:f32,
+        y:f32
+    }
+
+    impl Vec2{
+        pub fn new(x:f32,y:f32) ->Self{
+            Vec2{x,y}
+        }
+        pub fn len(&self) ->f32 {
+            (self.x.powf(2f32) + self.y.powf(2f32)).sqrt()
+        }
+        pub fn unitized(&mut self){
+            let len = self.len();
+            let ratio =  1.0f32/len;
+            self.x *= ratio;
+            self.y *= ratio;
+        }
+        pub fn dot_product(&self,oth:&Self) -> f32{
+            self.x * oth.x + self.y * oth.y
+        }
+        pub fn multiply(&mut self,n:f32)
+        {
+            self.x *= n;
+            self.y *= n;
+        }
+        pub fn angle(&self,other:&Self) -> f32
+        {
+            let mut oth = other.clone();
+            oth.unitized();
+
+            let mut sel = self.clone();
+            sel.unitized();
+
+            sel.dot_product(&oth).acos()
+        }
+        pub fn Projection(&self,oth:&Self)->Vec2{
+            let v_len = self.angle(oth).cos() * self.len();
+            let ration = v_len / oth.len();
+            let mut ret = oth.clone();
+            ret.multiply(ration);
+            ret
+        }
+    }
+
+    impl Display for Vec2{
+        fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+            write!(f,"x = {},y = {}",self.x,self.y);
+            Ok(())
+        }
+    }
+
+    pub fn test(){
+        let mut v = Vec2::new(3f32,5f32);
+        println!("v.len = {}",v.len());
+        v.unitized();
+        println!("v.len = {}",v.len());
+
+        let v2 = Vec2::new(0f32,4f32);
+        let v3 = Vec2::new(0f32,-4f32);
+
+        println!("angle = {}",v2.angle(&v3));
+
+
+        let v4 = Vec2::new(4f32,0f32);
+        let v5 = Vec2::new(2f32,3f32);
+
+        let v6 = v5.Projection(&v4);
+        println!("{}",v6);
+
+        let v4 = Vec2::new(4f32,1f32);
+        let v5 = Vec2::new(2f32,3f32);
+
+        let v6 = v5.Projection(&v4);
+        println!("{}",v6);
     }
 }
 
 fn main() {
 //    if cfg!(target_os = "windows") {
-//        t14::test();
-//    }
-    t16::test();
+////        t14::test();
+////    }
+    t17::test();
 }
