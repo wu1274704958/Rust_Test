@@ -22,7 +22,7 @@ pub fn test(){
     }
 
     let p1 = Point2d::new(w_half, h_half * 0.6);
-    let p1_ctrl = Point2d::new( p1.x - w * 0.2 , p1.y - h * 0.4);
+    let p1_ctrl = Point2d::new( p1.x - w * 0.2 , p1.y - h * 0.5);
 
     let p2 = Point2d::new(w_half *  0.3, h_half * 0.3);
     let p2_ctrl = Point2d::new( p2.x + w * 0.001 , p2.y + h * 0.2);
