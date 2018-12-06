@@ -1,114 +1,82 @@
-use winapi::um::winuser::*;
-use winapi::shared::windef::HWND;
+
 use std::vec::Vec;
-use std::ffi::{ CString};
 
-struct SysLv{
-    hwnd : HWND,
-    item_num : u32
-}
-
-const LVM_FIRST:u32 = 0x1000;
-
-macro_rules! MAKE_LPARAM {
-    ($l:ident,$h:ident) => {
-        {
-            let a:i32 = std::mem::transmute($l );
-            let b:i32 = std::mem::transmute($h );
-            (a  & 0xffff | (b & 0xffff) << 16)
-        }
-    };
-}
-
-impl SysLv {
-    pub fn new() -> SysLv{
-        let h = SysLv::find_hwnd();
-        SysLv{hwnd : h , item_num : SysLv::ListView_GetItemCount(h) }
-    }
-    pub fn size(&self) -> u32 {
-        self.item_num
-    }
-
-    fn ListView_GetItemCount(hwnd:HWND) ->u32{
-        unsafe { SendMessageA(hwnd,LVM_FIRST + 4u32,0,0) as u32 }
-    }
-    pub fn set_item_pos(&self,index:u32,x:i32,y:i32){
-        unsafe { SendMessageA(self.hwnd,LVM_FIRST + 15u32,index as usize,MAKE_LPARAM!(x,y) as isize) };
-    }
-
-    fn find_hwnd() -> HWND{
-        unsafe {
-            let a = CString::new("Progman").unwrap();
-            let b = CString::new("Program Manager").unwrap();
-            let progman: HWND = FindWindowA(a.as_ptr() as *const i8,  b.as_ptr() as *const i8);
-
-            let c = CString::new("SHELLDLL_DefView").unwrap();
-            let def_view: HWND = FindWindowExA(progman, 0 as HWND, c.as_ptr() as *const i8, 0 as *const i8);
-            let d = CString::new("SysListView32").unwrap();
-            let e = CString::new("FolderView").unwrap();
-            FindWindowExA(def_view, 0 as HWND, d.as_ptr() as *const i8,  e.as_ptr() as *const i8)
-        }
-    }
-}
+use syslv::SysLv;
 
 use nbez::{BezCurve, BezChain, Bez3o, Point2d};
 
-const W :u32 = 1366;
-const H :u32 = 700;
+const W :u32 = 1920;
+const H :u32 = 1080;
 
 pub fn test(){
     let sys_lv = SysLv::new();
-    let w_half =  (W / 2) as f32;
 
+    let w = W as f32;
+    let h = H as f32;
+    let w_half =  w / 2.0;
+    let h_half = h / 2.0;
 
 
     for i in 0..sys_lv.size(){
         sys_lv.set_item_pos(i,-30,-30);
     }
 
+    let p1 = Point2d::new(w_half, h_half * 0.6);
+    let p1_ctrl = Point2d::new( p1.x - w * 0.2 , p1.y - h * 0.4);
+
+    let p2 = Point2d::new(w_half *  0.3, h_half * 0.3);
+    let p2_ctrl = Point2d::new( p2.x + w * 0.001 , p2.y + h * 0.2);
+
+    let p3 = Point2d::new(p2.x,p2.y);
+    let p3_ctrl = Point2d::new( p3.x - w * 0.2 , p3.y + h * 0.3);
+
+    let p4 = Point2d::new(w_half * 0.86 , h * 0.9);
+    let p4_ctrl = Point2d::new( p4.x + w * 0.15 , p4.y + h * 0.1);
 
     let curve: Bez3o<f32> = Bez3o::new(
-        Point2d::new(  w_half    ,  200f32),
-        Point2d::new(   w_half - 100f32   , 200f32 - 420f32),
-        Point2d::new( 200f32 - 200f32 ,   300f32 - 100f32),
-        Point2d::new(  200f32,   300f32),
+        p1,
+        p1_ctrl,
+        p2,
+        p2_ctrl
     );
 
     let curve2: Bez3o<f32> = Bez3o::new(
-        Point2d::new(  160f32    ,  330f32),
-        Point2d::new(   160f32 - 0f32    , 320f32 + 160f32 ),
-        Point2d::new( w_half - 100f32   ,   700f32 - 100f32 ),
-        Point2d::new(  w_half  ,   700f32),
+        p3,
+        p3_ctrl,
+        p4,
+        p4_ctrl
     );
 
-    let curve3: Bez3o<f32> = Bez3o::new(
-        Point2d::new(  w_half    ,  700f32),
-        Point2d::new(   w_half + 100f32   ,   700f32 - 100f32  ),
-        Point2d::new( W as f32 - 100f32 - 0f32    , 320f32 + 160f32 ),
-        Point2d::new(  W as f32 - 100f32     ,  330f32),
-    );
-
-    let curve4: Bez3o<f32> = Bez3o::new(
-        Point2d::new(   W as f32 - 140f32,   280f32),
-        Point2d::new(   W as f32 - 140f32 + 20f32  ,   280f32 - 180f32),
-        Point2d::new( w_half + 100f32 ,   200f32 - 420f32),
-        Point2d::new( w_half    ,  200f32),
-    );
+//    let curve3: Bez3o<f32> = Bez3o::new(
+//        Point2d::new(  w_half    ,  700f32),
+//        Point2d::new(   w_half + 100f32   ,   700f32 - 100f32  ),
+//        Point2d::new( W as f32 - 100f32 - 0f32    , 320f32 + 160f32 ),
+//        Point2d::new(  W as f32 - 100f32     ,  330f32),
+//    );
+//
+//    let curve4: Bez3o<f32> = Bez3o::new(
+//        Point2d::new(   W as f32 - 140f32,   280f32),
+//        Point2d::new(   W as f32 - 140f32 + 20f32  ,   280f32 - 180f32),
+//        Point2d::new( w_half + 100f32 ,   200f32 - 420f32),
+//        Point2d::new( w_half    ,  200f32),
+//    );
 
     let curve_chain: BezChain<f32, Bez3o<f32>, Vec<Point2d<f32>>> = BezChain::from_container(vec![
         curve.start,
         curve.ctrl0,
         curve.ctrl1,
+
         curve2.start,
         curve2.ctrl0,
         curve2.ctrl1,
-        curve3.start,
-        curve3.ctrl0,
-        curve3.ctrl1,
-        curve4.start,
-        curve4.ctrl0,
-        curve4.ctrl1,
-        curve4.end
+        curve2.end
+//        curve3.start,
+//        curve3.ctrl0,
+//        curve3.ctrl1,
+//        curve4.start,
+//        curve4.ctrl0,
+//        curve4.ctrl1,
+//        curve4.end
     ]);
     let mut _a = 0;
 
@@ -127,7 +95,13 @@ pub fn test(){
         }
     }
 
+    println!("size = {} ",points.len());
+
     for i in 0..points.len(){
         sys_lv.set_item_pos(i as u32,points[i].x as i32 ,points[i].y as i32);
+    }
+    let b = points.len();
+    for i in 0..points.len(){
+        sys_lv.set_item_pos((i + b) as u32,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
     }
 }
