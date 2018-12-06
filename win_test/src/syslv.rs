@@ -1,5 +1,14 @@
 use winapi::um::winuser::*;
-use winapi::shared::windef::HWND;
+use winapi::um::commctrl::{
+    LVM_GETITEMCOUNT,
+    LVM_SETITEMPOSITION,
+    LVM_GETITEMPOSITION
+};
+use winapi::shared::windef::{
+    HWND,
+    POINT,
+    PPOINT
+};
 use std::ffi::{ CString};
 
 pub struct SysLv{
@@ -7,7 +16,6 @@ pub struct SysLv{
     item_num : u32
 }
 
-const LVM_FIRST:u32 = 0x1000;
 
 macro_rules! MAKE_LPARAM {
     ($l:ident,$h:ident) => {
@@ -29,10 +37,21 @@ impl SysLv {
     }
 
     fn ListView_GetItemCount(hwnd:HWND) ->u32{
-        unsafe { SendMessageA(hwnd,LVM_FIRST + 4u32,0,0) as u32 }
+        unsafe { SendMessageA(hwnd,LVM_GETITEMCOUNT,0,0) as u32 }
     }
-    pub fn set_item_pos(&self,index:u32,x:i32,y:i32){
-        unsafe { SendMessageA(self.hwnd,LVM_FIRST + 15u32,index as usize,MAKE_LPARAM!(x,y) as isize) };
+    pub fn set_item_pos(&self,index:usize,x:i32,y:i32){
+        unsafe { SendMessageA(self.hwnd,LVM_SETITEMPOSITION,index,MAKE_LPARAM!(x,y) as isize) };
+    }
+    pub fn get_item_pos(&self,index:usize) -> POINT
+    {
+        let ret = POINT{x:0,y:0};
+        let ptr = &ret as *const POINT as *mut POINT;
+        unsafe {
+            println!("{}",SendMessageA(self.hwnd,LVM_GETITEMPOSITION,index,ptr as isize));
+            println!("{} {}",(*ptr).x,(*ptr).y);
+        };
+
+        ret
     }
 
     fn find_hwnd() -> HWND{

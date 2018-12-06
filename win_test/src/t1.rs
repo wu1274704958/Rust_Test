@@ -18,7 +18,8 @@ pub fn test(){
 
 
     for i in 0..sys_lv.size(){
-        sys_lv.set_item_pos(i,-30,-30);
+        sys_lv.get_item_pos(i as usize);
+        sys_lv.set_item_pos(i as usize,-30,-30);
     }
 
     let p1 = Point2d::new(w_half, h_half * 0.6);
@@ -95,13 +96,12 @@ pub fn test(){
         }
     }
 
-    println!("size = {} ",points.len());
 
     for i in 0..points.len(){
-        sys_lv.set_item_pos(i as u32,points[i].x as i32 ,points[i].y as i32);
+        sys_lv.set_item_pos(i ,points[i].x as i32 ,points[i].y as i32);
     }
     let b = points.len();
     for i in 0..points.len(){
-        sys_lv.set_item_pos((i + b) as u32,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
+        sys_lv.set_item_pos(i + b ,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
     }
 }
