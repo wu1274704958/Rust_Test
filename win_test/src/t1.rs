@@ -85,8 +85,8 @@ pub fn test(){
 
     for curve in curve_chain.iter() {
         let mut t = 0.0f32;
-        let zl = 1f32 / 9.8f32;
-        for _i in 0..10{
+        let zl = 1f32 / 15.0f32;
+        for _i in 0..15{
             let temp = curve.interp(t).unwrap();
             // println!("{:?}",temp);
             points.push(temp);
