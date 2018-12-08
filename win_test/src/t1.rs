@@ -1,12 +1,14 @@
 
 use std::vec::Vec;
 
-use syslv::SysLv;
+use crate::syslv::SysLv;
+use std::thread::sleep;
+use core::time::Duration;
 
 use nbez::{BezCurve, BezChain, Bez3o, Point2d};
 
-const W :u32 = 1920;
-const H :u32 = 1080;
+const W :u32 = 1366;
+const H :u32 = 768;
 
 pub fn test(){
     let sys_lv = SysLv::new();
@@ -16,22 +18,23 @@ pub fn test(){
     let w_half =  w / 2.0;
     let h_half = h / 2.0;
 
+    let mut pervious = vec![];
 
     for i in 0..sys_lv.size(){
-        sys_lv.get_item_pos(i as usize);
+        pervious.push(sys_lv.get_item_pos(i as usize));
         sys_lv.set_item_pos(i as usize,-30,-30);
     }
 
-    let p1 = Point2d::new(w_half, h_half * 0.6);
+    let p1 = Point2d::new(w_half, h_half * 0.7);
     let p1_ctrl = Point2d::new( p1.x - w * 0.2 , p1.y - h * 0.5);
 
-    let p2 = Point2d::new(w_half *  0.3, h_half * 0.3);
+    let p2 = Point2d::new(w_half *  0.3, h_half * 0.4);
     let p2_ctrl = Point2d::new( p2.x + w * 0.001 , p2.y + h * 0.2);
 
     let p3 = Point2d::new(p2.x ,p2.y );
     let p3_ctrl = Point2d::new( p3.x - w * 0.2 , p3.y + h * 0.3);
 
-    let p4 = Point2d::new(w_half * 0.86 , h * 0.9);
+    let p4 = Point2d::new(w_half * 0.86 , h );
     let p4_ctrl = Point2d::new( p4.x + w * 0.15 , p4.y + h * 0.1);
 
     let curve: Bez3o<f32> = Bez3o::new(
@@ -98,10 +101,17 @@ pub fn test(){
 
 
     for i in 0..points.len(){
-        sys_lv.set_item_pos(i ,points[i].x as i32 ,points[i].y as i32);
+        sys_lv.set_item_pos_center(i ,points[i].x as i32 ,points[i].y as i32);
     }
     let b = points.len();
     for i in 0..points.len(){
-        sys_lv.set_item_pos(i + b ,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
+        sys_lv.set_item_pos_center(i + b ,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
     }
+
+    sleep(Duration::from_secs(5));
+
+    for i in 0..pervious.len(){
+        sys_lv.set_item_pos(i,pervious[i].x,pervious[i].y);
+    }
+
 }

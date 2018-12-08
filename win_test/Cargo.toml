@@ -2,9 +2,10 @@
 name = "win_test"
 version = "0.1.0"
 authors = ["wws"]
+edition = "2018"
 
 [dependencies]
 nbez = "0.1.0"
 
 [target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3.5", features = ["winuser","commctrl"] }
+winapi = { version = "0.3.5", features = ["winuser","commctrl","winnt","memoryapi","processthreadsapi","minwindef","handleapi"] }
