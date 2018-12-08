@@ -1,8 +1,8 @@
 pub extern crate libc;
 
-use super::std::fmt::Debug;
-use super::std::fmt::Formatter;
-use super::std::fmt;
+use std::fmt::Debug;
+use std::fmt::Formatter;
+use std::fmt;
 
 struct Pair<K, V> {
     key: K,
@@ -89,8 +89,8 @@ pub fn test4()
                 println!("{}", y);
 
                 unsafe {
-                    let mut c = (*y) as *const i32;
-                    let mut d = c as *mut i32;
+                    let c = (*y) as *const i32;
+                    let d = c as *mut i32;
                     *d = 78;
                 }
                 println!("{}", y);

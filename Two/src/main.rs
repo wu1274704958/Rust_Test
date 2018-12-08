@@ -58,24 +58,17 @@ mod t3 {
 }
 
 mod t4 {
-    use std::ptr::NonNull;
     pub fn test()
     {
         let mut a: Option<i32> = Some(8);
-        let ptr = NonNull::new(&mut a as *mut Option<_>);
         while let Some(ref mut n) = a {
             if *n <= 0 {
-                //a = None;
-                if let Some(mut p) = ptr{
-                    let mut temp_p = unsafe {p.as_mut()};
-                    *temp_p = None;
-                }
+                a = None;
                 break;
             } else {
                 *n -= 1;
             }
         }
-
         println!("{:?}", a);
     }
 }
@@ -131,8 +124,8 @@ mod t7{
     use std::fmt::Display;
     use std::fmt::Formatter;
     use std::fmt::Error;
-    use t1::libc::system;
-    use t1::libc::getpid;
+    use libc::system;
+    use libc::getpid;
     use std::clone::Clone;
     use std::mem;
     use std::cell::*;
@@ -617,7 +610,7 @@ mod t13{
 
 #[cfg(target_os="windows")]
 mod t14{
-    use t1::libc::{c_int,c_void};
+    use libc::{c_int,c_void};
 
     #[allow(dead_code)]
     #[link(name = "test_dll")]
@@ -798,5 +791,5 @@ fn main() {
 //    if cfg!(target_os = "windows") {
 ////        t14::test();
 ////    }
-    t17::test();
+    t4::test();
 }
