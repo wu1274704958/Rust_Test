@@ -5,13 +5,27 @@ use crate::syslv::SysLv;
 use std::thread::sleep;
 use core::time::Duration;
 
+use std::fs::*;
+use std::path::*;
+use winapi::um::winbase::GetUserNameA;
+use winapi::shared::minwindef::*;
+use std::ffi::{CStr};
 use nbez::{BezCurve, BezChain, Bez3o, Point2d};
 
 const W :u32 = 1366;
 const H :u32 = 768;
 
+fn create_item(n:u32){
+    let un = get_user_name();
+}
+
 pub fn test(){
-    let sys_lv = SysLv::new();
+    let mut sys_lv = SysLv::new();
+
+    if sys_lv.size() < 60 {
+        create_item(60 - sys_lv.size());
+        sys_lv.refresh_num();
+    }
 
     let w = sys_lv.W as f32;
     let h = sys_lv.H as f32;
@@ -115,3 +129,19 @@ pub fn test(){
     }
 
 }
+
+fn get_user_name() ->String
+{
+    let mut name:[u8;256] = [0;256];
+    let mut size:DWORD = 256;
+    unsafe {
+        let _res = GetUserNameA(name.as_mut_ptr() as *mut i8,&size as *const _ as *mut _);
+        let mut n:Vec<u8> = Vec::new();
+        for i in 0..size{
+            n.push(name[i as usize]);
+        }
+        let cstr = CStr::from_bytes_with_nul(n.as_ref()).unwrap();
+        cstr.to_str().unwrap().to_string()
+    }
+}
+

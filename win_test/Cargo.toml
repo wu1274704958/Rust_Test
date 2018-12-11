@@ -8,4 +8,4 @@ edition = "2018"
 nbez = "0.1.0"
 
 [target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3.5", features = ["winuser","commctrl","winnt","memoryapi","processthreadsapi","minwindef","handleapi"] }
+winapi = { version = "0.3.5", features = ["winuser","commctrl","winnt","memoryapi","processthreadsapi","minwindef","handleapi","winbase"] }

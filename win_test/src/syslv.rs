@@ -163,4 +163,8 @@ impl SysLv {
             FindWindowExA(def_view, 0 as HWND, d.as_ptr() as *const i8,  e.as_ptr() as *const i8)
         }
     }
+    pub fn refresh_num(&mut self)
+    {
+        self.item_num = SysLv::ListView_GetItemCount(self.hwnd);
+    }
 }
