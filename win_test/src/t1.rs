@@ -13,8 +13,8 @@ const H :u32 = 768;
 pub fn test(){
     let sys_lv = SysLv::new();
 
-    let w = W as f32;
-    let h = H as f32;
+    let w = sys_lv.W as f32;
+    let h = sys_lv.H as f32;
     let w_half =  w / 2.0;
     let h_half = h / 2.0;
 
@@ -34,7 +34,7 @@ pub fn test(){
     let p3 = Point2d::new(p2.x ,p2.y );
     let p3_ctrl = Point2d::new( p3.x - w * 0.2 , p3.y + h * 0.3);
 
-    let p4 = Point2d::new(w_half * 0.86 , h );
+    let p4 = Point2d::new(w_half * 0.76 , h );
     let p4_ctrl = Point2d::new( p4.x + w * 0.15 , p4.y + h * 0.1);
 
     let curve: Bez3o<f32> = Bez3o::new(

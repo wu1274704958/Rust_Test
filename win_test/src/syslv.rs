@@ -76,7 +76,9 @@ impl Drop for ProcessVM{
 pub struct SysLv{
     hwnd        : HWND,
     item_num    : u32,
-    processVM   : ProcessVM
+    processVM   : ProcessVM,
+    pub W           : u32,
+    pub H           : u32,
 }
 
 
@@ -93,9 +95,18 @@ macro_rules! MAKE_LPARAM {
 impl SysLv {
     pub fn new() -> SysLv{
         let h = SysLv::find_hwnd();
+        let rect = unsafe {
+            let res = RECT { left: 0, right: 0, top: 0, bottom: 0 };
+            GetWindowRect(h, &res as *const _ as *mut _);
+            res
+        };
+
         SysLv{hwnd : h ,
             item_num : SysLv::ListView_GetItemCount(h) ,
-            processVM : ProcessVM::new(512usize,h) }
+            processVM : ProcessVM::new(512usize,h) ,
+            W : (rect.right - rect.left) as u32,
+            H : (rect.bottom - rect.top) as u32
+        }
     }
     pub fn size(&self) -> u32 {
         self.item_num
