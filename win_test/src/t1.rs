@@ -15,8 +15,23 @@ use nbez::{BezCurve, BezChain, Bez3o, Point2d};
 const W :u32 = 1366;
 const H :u32 = 768;
 
-fn create_item(n:u32){
+fn create_item(n:u32)-> Vec<String>{
     let un = get_user_name();
+    let mut buf = String::new();
+    buf.push_str("C:\\Users\\");
+    buf.push_str(un.as_str());
+    buf.push_str("\\Desktop\\");
+    let path = Path::new(buf.as_str());
+    let mut res:Vec<String>;
+    if path.exists() {
+        for i in 0..n{
+            let pp = path.join(format!("{}.txt",i));
+            if let Ok(f) = File::create(pp.as_path()){
+                res.push();
+            }
+        }
+    }
+    res
 }
 
 pub fn test(){
@@ -26,7 +41,6 @@ pub fn test(){
         create_item(60 - sys_lv.size());
         sys_lv.refresh_num();
     }
-
     let w = sys_lv.W as f32;
     let h = sys_lv.H as f32;
     let w_half =  w / 2.0;
@@ -114,19 +128,21 @@ pub fn test(){
     }
 
 
-    for i in 0..points.len(){
-        sys_lv.set_item_pos_center(i ,points[i].x as i32 ,points[i].y as i32);
-    }
-    let b = points.len();
-    for i in 0..points.len(){
-        sys_lv.set_item_pos_center(i + b ,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
-    }
-
+//    for i in 0..points.len(){
+//        sys_lv.set_item_pos_center(i ,points[i].x as i32 ,points[i].y as i32);
+//    }
+//    let b = points.len();
+//    for i in 0..points.len(){
+//        sys_lv.set_item_pos_center(i + b ,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
+//    }
+    let fs = create_item(20);
     sleep(Duration::from_secs(5));
-
-    for i in 0..pervious.len(){
-        sys_lv.set_item_pos(i,pervious[i].x,pervious[i].y);
-    }
+    fs.iter().for_each(|f|{
+        remove_file(f);
+    })
+//    for i in 0..pervious.len(){
+//        sys_lv.set_item_pos(i,pervious[i].x,pervious[i].y);
+//    }
 
 }
 
