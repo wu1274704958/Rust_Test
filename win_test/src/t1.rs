@@ -15,19 +15,19 @@ use nbez::{BezCurve, BezChain, Bez3o, Point2d};
 const W :u32 = 1366;
 const H :u32 = 768;
 
-fn create_item(n:u32)-> Vec<String>{
+fn create_item(n:u32)-> Vec<PathBuf>{
     let un = get_user_name();
     let mut buf = String::new();
     buf.push_str("C:\\Users\\");
     buf.push_str(un.as_str());
     buf.push_str("\\Desktop\\");
     let path = Path::new(buf.as_str());
-    let mut res:Vec<String>;
+    let mut res:Vec<PathBuf> = vec![];
     if path.exists() {
         for i in 0..n{
             let pp = path.join(format!("{}.txt",i));
             if let Ok(f) = File::create(pp.as_path()){
-                res.push();
+                res.push(pp);
             }
         }
     }
@@ -37,10 +37,15 @@ fn create_item(n:u32)-> Vec<String>{
 pub fn test(){
     let mut sys_lv = SysLv::new();
 
-    if sys_lv.size() < 60 {
-        create_item(60 - sys_lv.size());
+    let fs = if sys_lv.size() < 60 {
+        let fs = create_item(60 - sys_lv.size());
+        sleep(Duration::from_secs(3));
         sys_lv.refresh_num();
-    }
+        fs
+    }else{
+        vec![]
+    };
+
     let w = sys_lv.W as f32;
     let h = sys_lv.H as f32;
     let w_half =  w / 2.0;
@@ -126,23 +131,24 @@ pub fn test(){
             t += zl;
         }
     }
+    println!("size = {}",points.len() * 2);
 
+    for i in 0..points.len(){
+        sys_lv.set_item_pos_center(i ,points[i].x as i32 ,points[i].y as i32);
+    }
+    let b = points.len();
+    for i in 0..points.len(){
+        sys_lv.set_item_pos_center(i + b ,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
+    }
 
-//    for i in 0..points.len(){
-//        sys_lv.set_item_pos_center(i ,points[i].x as i32 ,points[i].y as i32);
-//    }
-//    let b = points.len();
-//    for i in 0..points.len(){
-//        sys_lv.set_item_pos_center(i + b ,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
-//    }
-    let fs = create_item(20);
     sleep(Duration::from_secs(5));
+
+    for i in 0..pervious.len(){
+        sys_lv.set_item_pos(i,pervious[i].x,pervious[i].y);
+    }
     fs.iter().for_each(|f|{
-        remove_file(f);
-    })
-//    for i in 0..pervious.len(){
-//        sys_lv.set_item_pos(i,pervious[i].x,pervious[i].y);
-//    }
+        remove_file(f.as_path());
+    });
 
 }
 
