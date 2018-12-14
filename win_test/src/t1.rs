@@ -26,14 +26,14 @@ fn create_item(n:u32)-> Vec<PathBuf>{
     if path.exists() {
         for i in 0..n{
             let pp = path.join(format!("{}.txt",i));
-            if let Ok(f) = File::create(pp.as_path()){
+            if let Ok(_) = File::create(pp.as_path()){
                 res.push(pp);
             }
         }
     }
     res
 }
-
+#[allow(unused_must_use)]
 pub fn test(){
     let mut sys_lv = SysLv::new();
 
@@ -157,7 +157,7 @@ fn get_user_name() ->String
     let mut name:[u8;256] = [0;256];
     let mut size:DWORD = 256;
     unsafe {
-        let _res = GetUserNameA(name.as_mut_ptr() as *mut i8,&size as *const _ as *mut _);
+        let _res = GetUserNameA(name.as_mut_ptr() as *mut i8,&mut size as *mut _);
         let mut n:Vec<u8> = Vec::new();
         for i in 0..size{
             n.push(name[i as usize]);
