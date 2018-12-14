@@ -707,6 +707,7 @@ mod t16{
 
 mod t17{
     use std::fmt::{ Display,Formatter,Error};
+    use core::ops::{ Add ,Sub};
 
     #[derive(Clone,Copy)]
     struct Vec2{
@@ -752,6 +753,10 @@ mod t17{
             ret.multiply(ration);
             ret
         }
+        pub fn mul(&self,n:f32)->Vec2
+        {
+            Vec2::new(n * self.x,n * self.y)
+        }
     }
 
     impl Display for Vec2{
@@ -761,7 +766,26 @@ mod t17{
         }
     }
 
+    impl Add for Vec2{
+        type Output = Self;
+
+        fn add(self, rhs: Self) -> <Self as Add>::Output {
+            Vec2::new(self.x + rhs.x,self.y + rhs.y)
+        }
+    }
+
+    impl Sub for Vec2{
+        type Output = Self;
+
+        fn sub(self, rhs: Self) -> <Self as Sub>::Output {
+            Vec2::new(self.x - rhs.x,self.y - rhs.y)
+        }
+    }
+
+
     pub fn test(){
+        println!("seizof(Vec2) = {}",std::mem::size_of::<Vec2>());
+
         let mut v = Vec2::new(3f32,5f32);
         println!("v.len = {}",v.len());
         v.unitized();
@@ -784,6 +808,13 @@ mod t17{
 
         let v6 = v5.Projection(&v4);
         println!("{}",v6);
+
+        println!("{}", Vec2::new(1f32,0f32) + Vec2::new(0f32,1f32));
+
+        println!("{}", Vec2::new(1f32,0f32) - Vec2::new(0f32,1f32));
+
+        println!("{}", Vec2::new(1f32,1f32).mul(2f32));
+
     }
 }
 
@@ -791,5 +822,5 @@ fn main() {
 //    if cfg!(target_os = "windows") {
 ////        t14::test();
 ////    }
-    t4::test();
+    t17::test();
 }
