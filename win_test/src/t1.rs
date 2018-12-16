@@ -131,22 +131,37 @@ pub fn test(){
         for _i in 0..15{
             let temp = curve.interp(t).unwrap();
             // println!("{:?}",temp);
-            let one_step = Vec2::new(temp.x,temp.y) - half;
-            let two_step = Mat2::from_scale(Vec2::new(0.8f32,0.8f32)) * one_step;
-            points.push( two_step +  half);
+
+            points.push( Vec2::new(temp.x,temp.y));
             _a += 1;
             t += zl;
         }
     }
     println!("size = {}",points.len() * 2);
+    let mut scale = 1.5f32;
+    let mut points_curr:Vec<Vec2> = Vec::new();
+    points_curr.reserve(40);
+    loop {
+        if scale < 0.8f32 {break;}
+        points_curr.clear();
+        points.iter().for_each(|it|{
+            let one_step = (*it) - half;
+            let two_step = Mat2::from_scale(Vec2::new(scale,scale)) * one_step;
+            points_curr.push(two_step + half);
+        });
 
-    for i in 0..points.len(){
-        sys_lv.set_item_pos_center(i ,points[i].x as i32 ,points[i].y as i32);
+        for i in 0..points_curr.len(){
+            sys_lv.set_item_pos_center(i ,points_curr[i].x as i32 ,points_curr[i].y as i32);
+        }
+        let b = points_curr.len();
+        for i in 0..points_curr.len(){
+            sys_lv.set_item_pos_center(i + b ,(w_half + (w_half - points_curr[i].x)) as i32 ,points_curr[i].y as i32);
+        }
+
+        scale -= 0.01f32;
     }
-    let b = points.len();
-    for i in 0..points.len(){
-        sys_lv.set_item_pos_center(i + b ,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
-    }
+
+
 
     sleep(Duration::from_secs(5));
 
