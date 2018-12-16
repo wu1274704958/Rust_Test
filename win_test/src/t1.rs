@@ -60,16 +60,16 @@ pub fn test(){
         sys_lv.set_item_pos(i as usize,-30,-30);
     }
 
-    let p1 = Point2d::new(w_half, h_half * 0.7);
+    let p1 = Point2d::new(w_half, h_half * 0.6);
     let p1_ctrl = Point2d::new( p1.x - w * 0.2 , p1.y - h * 0.5);
 
-    let p2 = Point2d::new(w_half *  0.3, h_half * 0.4);
+    let p2 = Point2d::new(w_half *  0.3, h_half * 0.3);
     let p2_ctrl = Point2d::new( p2.x + w * 0.001 , p2.y + h * 0.2);
 
     let p3 = Point2d::new(p2.x ,p2.y );
     let p3_ctrl = Point2d::new( p3.x - w * 0.2 , p3.y + h * 0.3);
 
-    let p4 = Point2d::new(w_half * 0.76 , h );
+    let p4 = Point2d::new(w_half * 0.76 , h * 0.9 );
     let p4_ctrl = Point2d::new( p4.x + w * 0.15 , p4.y + h * 0.1);
 
     let curve: Bez3o<f32> = Bez3o::new(
@@ -156,7 +156,6 @@ pub fn test(){
     fs.iter().for_each(|f|{
         remove_file(f.as_path());
     });
-
 }
 
 fn get_user_name() ->String
