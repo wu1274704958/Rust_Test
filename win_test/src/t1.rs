@@ -15,6 +15,8 @@ use nbez::{BezCurve, BezChain, Bez3o, Point2d};
 const W :u32 = 1366;
 const H :u32 = 768;
 
+use crate::transform::{Vec2,Mat2};
+
 fn create_item(n:u32)-> Vec<PathBuf>{
     let un = get_user_name();
     let mut buf = String::new();
@@ -120,13 +122,18 @@ pub fn test(){
     let mut points = Vec::new();
     points.reserve(40);
 
+    let half = Vec2::new(w_half as f32,h_half as f32);
+
     for curve in curve_chain.iter() {
         let mut t = 0.0f32;
         let zl = 1f32 / 15.0f32;
+
         for _i in 0..15{
             let temp = curve.interp(t).unwrap();
             // println!("{:?}",temp);
-            points.push(temp);
+            let one_step = Vec2::new(temp.x,temp.y) - half;
+            let two_step = Mat2::from_scale(Vec2::new(0.8f32,0.8f32)) * one_step;
+            points.push( two_step +  half);
             _a += 1;
             t += zl;
         }
