@@ -63,7 +63,7 @@ pub fn test(){
     let p2_ctrl = Point2d::new( p2.x + w * 0.001 , p2.y + h * 0.2);
 
     let p3 = Point2d::new(p2.x ,p2.y );
-    let p3_ctrl = Point2d::new( p3.x - w * 0.2 , p3.y + h * 0.3);
+    let p3_ctrl = Point2d::new( p3.x - w * 0.15 , p3.y + h * 0.3);
 
     let p4 = Point2d::new(w_half * 0.76 , h * 0.9 );
     let p4_ctrl = Point2d::new( p4.x + w * 0.15 , p4.y + h * 0.1);
@@ -116,7 +116,7 @@ pub fn test(){
     let mut _a = 0;
 
     let mut points = Vec::new();
-    points.reserve(40);
+    points.reserve(60);
 
     let half = Vec2::new(w_half as f32,h_half as f32);
 
@@ -133,10 +133,17 @@ pub fn test(){
             t += zl;
         }
     }
-    println!("size = {}",points.len() * 2);
+
+    let b = points.len();
+    for i in 0..b{
+        points.push(Vec2::new(w_half + (w_half - points[i].x)  , points[i].y));
+    }
+
+    println!("size = {}",points.len());
     let mut scale = 1.2f32;
+    let mut angle = 0.0f32;
     let mut points_curr:Vec<Vec2> = Vec::new();
-    points_curr.reserve(40);
+    points_curr.reserve(60);
     loop {
         if scale < 0.8f32 {break;}
         points_curr.clear();
@@ -149,11 +156,8 @@ pub fn test(){
         for i in 0..points_curr.len(){
             sys_lv.set_item_pos_center(i ,points_curr[i].x as i32 ,points_curr[i].y as i32);
         }
-        let b = points_curr.len();
-        for i in 0..points_curr.len(){
-            sys_lv.set_item_pos_center(i + b ,(w_half + (w_half - points_curr[i].x)) as i32 ,points_curr[i].y as i32);
-        }
 
+        angle += 0.01f32;
         scale -= 0.01f32;
     }
 

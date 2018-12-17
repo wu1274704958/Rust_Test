@@ -101,6 +101,12 @@ impl Mat2{
             m21:0f32,m22:v.y
         }
     }
+    pub fn from_rotate(angle:f32)-> Mat2 {
+        Mat2{
+            m11:angle.cos(),m12:angle.sin(),
+            m21:-angle.sin(),m22:angle.cos()
+        }
+    }
 }
 
 impl Mul for Mat2{
