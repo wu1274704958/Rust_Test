@@ -844,6 +844,12 @@ mod t18{
                 m21:0f32,m22:v.y
             }
         }
+        pub fn from_rotate(angle:f32)-> Mat2 {
+            Mat2{
+                m11:angle.cos(),m12:angle.sin(),
+                m21:-angle.sin(),m22:angle.cos()
+            }
+        }
     }
 
     impl Mul for Mat2{
@@ -891,6 +897,8 @@ mod t18{
 
         println!("{}",Mat2::unit() * Vec2::new(1f32,2f32));
         println!("{}",Mat2::from_scale(Vec2::new(1.5f32,1.5f32)) * Vec2::new(2f32,2f32) );
+        println!("{}",Mat2::from_rotate(3.14f32) * Vec2::new(1f32,0f32) );
+        println!("{}",Mat2::from_rotate(3.1415926 * 0.5) * Vec2::new(1f32,0f32) );
     }
 }
 

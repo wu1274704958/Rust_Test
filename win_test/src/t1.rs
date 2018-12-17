@@ -134,7 +134,7 @@ pub fn test(){
         }
     }
     println!("size = {}",points.len() * 2);
-    let mut scale = 1.5f32;
+    let mut scale = 1.2f32;
     let mut points_curr:Vec<Vec2> = Vec::new();
     points_curr.reserve(40);
     loop {
