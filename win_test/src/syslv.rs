@@ -178,4 +178,38 @@ impl SysLv {
     {
         self.item_num = SysLv::ListView_GetItemCount(self.hwnd);
     }
+    pub fn as_ptr(&self) -> *mut SysLv{
+        self as *const _ as *mut _
+    }
+}
+
+use std::vec::Vec;
+
+pub struct ItemStateStore<'a>
+{
+    pervious    :Vec<POINT>,
+    sys_lv      :&'a SysLv
+}
+
+impl <'a> ItemStateStore<'a>
+{
+    pub fn new(sys_lv:&'a SysLv) -> ItemStateStore<'a>
+    {
+        let mut pervious = Vec::new();
+        for i in 0..sys_lv.size(){
+            pervious.push(sys_lv.get_item_pos(i as usize));
+        }
+        ItemStateStore{pervious,sys_lv}
+    }
+}
+
+impl<'a> Drop for ItemStateStore<'a>
+{
+    fn drop(&mut self) {
+        unsafe { (*self.sys_lv.as_ptr()).refresh_num(); }
+        for i in 0..self.pervious.len(){
+            if i as u32 >= self.sys_lv.size() { break; }
+            self.sys_lv.set_item_pos(i,self.pervious[i].x,self.pervious[i].y);
+        }
+    }
 }

@@ -1,7 +1,7 @@
 
 use std::vec::Vec;
 
-use crate::syslv::SysLv;
+use crate::syslv::{ SysLv,ItemStateStore};
 use std::thread::sleep;
 use core::time::Duration;
 
@@ -37,12 +37,14 @@ fn create_item(n:u32)-> Vec<PathBuf>{
 }
 #[allow(unused_must_use)]
 pub fn test(){
-    let mut sys_lv = SysLv::new();
+    let sys_lv = SysLv::new();
+
+    let itemStateStore = ItemStateStore::new(&sys_lv);
 
     let fs = if sys_lv.size() < 60 {
         let fs = create_item(60 - sys_lv.size());
         sleep(Duration::from_secs(3));
-        sys_lv.refresh_num();
+        unsafe { (*sys_lv.as_ptr()).refresh_num(); }
         fs
     }else{
         vec![]
@@ -53,12 +55,6 @@ pub fn test(){
     let w_half =  w / 2.0;
     let h_half = h / 2.0;
 
-    let mut pervious = vec![];
-
-    for i in 0..sys_lv.size(){
-        pervious.push(sys_lv.get_item_pos(i as usize));
-        sys_lv.set_item_pos(i as usize,-30,-30);
-    }
 
     let p1 = Point2d::new(w_half, h_half * 0.6);
     let p1_ctrl = Point2d::new( p1.x - w * 0.2 , p1.y - h * 0.5);
@@ -165,12 +161,10 @@ pub fn test(){
 
     sleep(Duration::from_secs(5));
 
-    for i in 0..pervious.len(){
-        sys_lv.set_item_pos(i,pervious[i].x,pervious[i].y);
-    }
     fs.iter().for_each(|f|{
         remove_file(f.as_path());
     });
+    sleep(Duration::from_secs(2));
 }
 
 fn get_user_name() ->String
