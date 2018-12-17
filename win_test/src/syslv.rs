@@ -132,10 +132,21 @@ impl SysLv {
     pub fn set_item_pos_center(&self,index:usize,x:i32,y:i32){
         let rect = self.get_item_rect(index,0);
         let pos = self.get_item_pos(index);
-        let half_w = (rect.right - rect.left) / 2;
-        let half_h = (rect.bottom - rect.top) / 2;
-        let offsetx = pos.x - rect.left ;
-        let offsety = pos.y - rect.right;
+        let half_w = (rect.right - rect.left).abs() / 2;
+        let half_h = (rect.bottom - rect.top).abs() / 2;
+        let offsetx = if pos.x < 0 && rect.left < 0 {
+            rect.left.abs() - pos.x.abs()
+        }else{
+            pos.x - rect.left
+        };
+        let offsety = if pos.y < 0 && rect.top < 0 {
+            rect.top.abs() - pos.y.abs()
+        }else{
+            pos.y - rect.top
+        };
+//        println!("rect = {} {} {} {}",rect.left,rect.top,rect.right,rect.bottom);
+//        println!("pos = {} {} ",pos.x,pos.y);
+//        println!("{} {} ",offsetx,offsety);
         unsafe { SendMessageA(self.hwnd,LVM_SETITEMPOSITION,index,MAKE_LPARAM!(x - half_w + offsetx , y - half_h + offsety) as isize) };
     }
 

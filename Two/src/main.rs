@@ -707,12 +707,11 @@ mod t16{
 
 mod t17{
     use std::fmt::{ Display,Formatter,Error};
-    use core::ops::{ Add ,Sub};
-
+    use core::ops::{ Add, Sub};
     #[derive(Clone,Copy)]
-    struct Vec2{
-        x:f32,
-        y:f32
+    pub struct Vec2{
+        pub x:f32,
+        pub y:f32
     }
 
     impl Vec2{
@@ -753,8 +752,7 @@ mod t17{
             ret.multiply(ration);
             ret
         }
-        pub fn mul(&self,n:f32)->Vec2
-        {
+        pub fn mul_k(&self,n:f32)->Self{
             Vec2::new(n * self.x,n * self.y)
         }
     }
@@ -770,7 +768,7 @@ mod t17{
         type Output = Self;
 
         fn add(self, rhs: Self) -> <Self as Add>::Output {
-            Vec2::new(self.x + rhs.x,self.y + rhs.y)
+            Vec2::new(self.x + rhs.x ,self.y + rhs.y)
         }
     }
 
@@ -778,10 +776,9 @@ mod t17{
         type Output = Self;
 
         fn sub(self, rhs: Self) -> <Self as Sub>::Output {
-            Vec2::new(self.x - rhs.x,self.y - rhs.y)
+            Vec2::new(self.x - rhs.x ,self.y - rhs.y)
         }
     }
-
 
     pub fn test(){
         println!("seizof(Vec2) = {}",std::mem::size_of::<Vec2>());
@@ -813,8 +810,87 @@ mod t17{
 
         println!("{}", Vec2::new(1f32,0f32) - Vec2::new(0f32,1f32));
 
-        println!("{}", Vec2::new(1f32,1f32).mul(2f32));
+        println!("{}", Vec2::new(1f32,1f32).mul_k(2f32));
 
+    }
+}
+
+mod t18{
+    use std::fmt::Debug;
+    use std::ops::Mul;
+    use crate::t17::Vec2;
+    #[derive(PartialEq)]
+    struct Mat2{
+        m11:f32, m12:f32,
+        m21:f32, m22:f32
+    }
+
+    impl Mat2{
+        pub fn new(m11:f32,m12:f32,m21:f32,m22:f32)-> Mat2{
+            Mat2{m11,m12,m21,m22}
+        }
+        pub fn unit() -> Mat2 {
+            Mat2::new(1f32,0f32,0f32,1f32)
+        }
+        pub fn transposition(&self) ->Mat2{
+            Mat2::new(self.m11,self.m21,self.m12,self.m22)
+        }
+        pub fn mul_k(&self,n:f32)->Mat2 {
+            Mat2::new(n * self.m11,n * self.m12,n * self.m21,n * self.m22)
+        }
+        pub fn from_scale(v:Vec2)-> Mat2 {
+            Mat2{
+                m11:v.x,m12:0f32,
+                m21:0f32,m22:v.y
+            }
+        }
+    }
+
+    impl Mul for Mat2{
+        type Output = Mat2;
+
+        fn mul(self, rhs: Self) -> <Self as Mul>::Output {
+            Mat2{
+                m11: self.m11 * rhs.m11 + self.m12 * rhs.m21, m12: self.m11 * rhs.m12 + self.m12 * rhs.m22,
+                m21: self.m21 * rhs.m11 + self.m22 * rhs.m21, m22: self.m21 * rhs.m12 + self.m22 * rhs.m22
+            }
+        }
+    }
+    impl Mul<Vec2> for Mat2{
+        type Output = Vec2;
+
+        fn mul(self, rhs: Vec2) -> <Self as Mul<Vec2>>::Output {
+            Vec2{
+                x: rhs.x * self.m11 + rhs.y * self.m12,
+                y: rhs.x * self.m21 + rhs.y * self.m22
+            }
+        }
+    }
+
+    impl Debug for Mat2{
+        fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+            write!(f,"┌\t\t\t┐\n\
+                      |\t{}\t{}\t|\n\
+                      |\t{}\t{}\t|\n\
+                      └\t\t\t┘",self.m11,self.m12,self.m21,self.m22);
+            Ok(())
+        }
+    }
+    pub fn test()
+    {
+        let m1 = Mat2::new(1f32,2f32,3f32,4f32);
+
+        println!("{:?}",m1.transposition());
+
+        println!("{:?}",m1.mul_k(2f32));
+
+        let A = Mat2::new(-3f32,0f32,5.0,0.5);
+        let B = Mat2::new(-7f32,2f32,4.0,6.0);
+
+        println!("{:?}",A * B);
+
+        println!("{}",Mat2::unit() * Vec2::new(1f32,2f32));
+        println!("{}",Mat2::from_scale(Vec2::new(1.5f32,1.5f32)) * Vec2::new(2f32,2f32) );
     }
 }
 
@@ -822,5 +898,5 @@ fn main() {
 //    if cfg!(target_os = "windows") {
 ////        t14::test();
 ////    }
-    t17::test();
+    t18::test();
 }

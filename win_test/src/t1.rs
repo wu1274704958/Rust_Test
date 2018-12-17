@@ -15,6 +15,8 @@ use nbez::{BezCurve, BezChain, Bez3o, Point2d};
 const W :u32 = 1366;
 const H :u32 = 768;
 
+use crate::transform::{Vec2,Mat2};
+
 fn create_item(n:u32)-> Vec<PathBuf>{
     let un = get_user_name();
     let mut buf = String::new();
@@ -26,14 +28,14 @@ fn create_item(n:u32)-> Vec<PathBuf>{
     if path.exists() {
         for i in 0..n{
             let pp = path.join(format!("{}.txt",i));
-            if let Ok(f) = File::create(pp.as_path()){
+            if let Ok(_) = File::create(pp.as_path()){
                 res.push(pp);
             }
         }
     }
     res
 }
-
+#[allow(unused_must_use)]
 pub fn test(){
     let mut sys_lv = SysLv::new();
 
@@ -58,16 +60,16 @@ pub fn test(){
         sys_lv.set_item_pos(i as usize,-30,-30);
     }
 
-    let p1 = Point2d::new(w_half, h_half * 0.7);
+    let p1 = Point2d::new(w_half, h_half * 0.6);
     let p1_ctrl = Point2d::new( p1.x - w * 0.2 , p1.y - h * 0.5);
 
-    let p2 = Point2d::new(w_half *  0.3, h_half * 0.4);
+    let p2 = Point2d::new(w_half *  0.3, h_half * 0.3);
     let p2_ctrl = Point2d::new( p2.x + w * 0.001 , p2.y + h * 0.2);
 
     let p3 = Point2d::new(p2.x ,p2.y );
     let p3_ctrl = Point2d::new( p3.x - w * 0.2 , p3.y + h * 0.3);
 
-    let p4 = Point2d::new(w_half * 0.76 , h );
+    let p4 = Point2d::new(w_half * 0.76 , h * 0.9 );
     let p4_ctrl = Point2d::new( p4.x + w * 0.15 , p4.y + h * 0.1);
 
     let curve: Bez3o<f32> = Bez3o::new(
@@ -120,26 +122,46 @@ pub fn test(){
     let mut points = Vec::new();
     points.reserve(40);
 
+    let half = Vec2::new(w_half as f32,h_half as f32);
+
     for curve in curve_chain.iter() {
         let mut t = 0.0f32;
         let zl = 1f32 / 15.0f32;
+
         for _i in 0..15{
             let temp = curve.interp(t).unwrap();
             // println!("{:?}",temp);
-            points.push(temp);
+
+            points.push( Vec2::new(temp.x,temp.y));
             _a += 1;
             t += zl;
         }
     }
     println!("size = {}",points.len() * 2);
+    let mut scale = 1.5f32;
+    let mut points_curr:Vec<Vec2> = Vec::new();
+    points_curr.reserve(40);
+    loop {
+        if scale < 0.8f32 {break;}
+        points_curr.clear();
+        points.iter().for_each(|it|{
+            let one_step = (*it) - half;
+            let two_step = Mat2::from_scale(Vec2::new(scale,scale)) * one_step;
+            points_curr.push(two_step + half);
+        });
 
-    for i in 0..points.len(){
-        sys_lv.set_item_pos_center(i ,points[i].x as i32 ,points[i].y as i32);
+        for i in 0..points_curr.len(){
+            sys_lv.set_item_pos_center(i ,points_curr[i].x as i32 ,points_curr[i].y as i32);
+        }
+        let b = points_curr.len();
+        for i in 0..points_curr.len(){
+            sys_lv.set_item_pos_center(i + b ,(w_half + (w_half - points_curr[i].x)) as i32 ,points_curr[i].y as i32);
+        }
+
+        scale -= 0.01f32;
     }
-    let b = points.len();
-    for i in 0..points.len(){
-        sys_lv.set_item_pos_center(i + b ,(w_half + (w_half - points[i].x)) as i32 ,points[i].y as i32);
-    }
+
+
 
     sleep(Duration::from_secs(5));
 
@@ -149,7 +171,6 @@ pub fn test(){
     fs.iter().for_each(|f|{
         remove_file(f.as_path());
     });
-
 }
 
 fn get_user_name() ->String
@@ -157,7 +178,7 @@ fn get_user_name() ->String
     let mut name:[u8;256] = [0;256];
     let mut size:DWORD = 256;
     unsafe {
-        let _res = GetUserNameA(name.as_mut_ptr() as *mut i8,&size as *const _ as *mut _);
+        let _res = GetUserNameA(name.as_mut_ptr() as *mut i8,&mut size as *mut _);
         let mut n:Vec<u8> = Vec::new();
         for i in 0..size{
             n.push(name[i as usize]);
