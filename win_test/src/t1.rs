@@ -17,7 +17,7 @@ const H :u32 = 768;
 
 use crate::transform::{Vec2,Mat2};
 
-fn create_item(n:u32)-> Vec<PathBuf>{
+pub fn create_item(n:u32)-> Vec<PathBuf>{
     let un = get_user_name();
     let mut buf = String::new();
     buf.push_str("C:\\Users\\");

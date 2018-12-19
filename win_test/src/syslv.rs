@@ -140,7 +140,7 @@ impl SysLv {
     }
 
     pub fn set_item_pos_center(&self,index:usize,x:i32,y:i32)->Result<(),&'static str> {
-        if index >= self.item_num as usize { return Result::Ok(()); }
+        if index >= self.item_num as usize { return Result::Err("Out of bound!!!"); }
         let mut offsets = self.offsets.borrow_mut();
         let offset:(i16,i16,u16,u16) = {
             if offsets.contains_key(&(index as u32)) {
@@ -172,6 +172,36 @@ impl SysLv {
 //        unsafe { SendMessageA(self.hwnd,LVM_SETITEMPOSITION,index,MAKE_LPARAM!(x - half_w + offsetx , y - half_h + offsety) as isize) };
         unsafe { SendMessageA(self.hwnd,LVM_SETITEMPOSITION,index,MAKE_LPARAM!(x - offset.2 as i32 + offset.0 as i32, y - offset.3 as i32 + offset.1 as i32) as isize) };
         Result::Ok(())
+    }
+
+    pub fn get_item_pos_center(&self,index:usize)->Result<POINT,&'static str> {
+        if index >= self.item_num as usize { return Result::Err("Out of bound!!!"); }
+        let mut offsets = self.offsets.borrow_mut();
+        let offset:(i16,i16,u16,u16) = {
+            if offsets.contains_key(&(index as u32)) {
+                offsets.get(&(index as u32)).unwrap().clone()
+            }else{
+                let rect = self.get_item_rect(index,0)?;
+                let pos = self.get_item_pos(index)?;
+                let half_w = (rect.right - rect.left).abs() / 2;
+                let half_h = (rect.bottom - rect.top).abs() / 2;
+                let offsetx = if pos.x < 0 && rect.left < 0 {
+                    rect.left.abs() - pos.x.abs()
+                }else{
+                    pos.x - rect.left
+                };
+                let offsety = if pos.y < 0 && rect.top < 0 {
+                    rect.top.abs() - pos.y.abs()
+                }else{
+                    pos.y - rect.top
+                };
+                let calc_ = (offsetx as i16,offsety as i16,half_w as u16,half_h as u16);
+                offsets.insert(index as u32,calc_.clone());
+                calc_
+            }
+        };
+        let pos = self.get_item_pos(index)?;
+        Result::Ok(POINT{x: pos.x - offset.0 as i32 + offset.2 as i32,y: pos.y - offset.1 as i32 + offset.3 as i32})
     }
 
     pub fn get_item_rect(&self,index:usize,r#type:u32) -> Result<RECT,&'static str>

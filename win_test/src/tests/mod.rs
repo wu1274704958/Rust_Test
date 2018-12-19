@@ -1,6 +1,6 @@
 use winapi::um::winuser::*;
 use winapi::um::winnt::*;
-use crate::syslv::ProcessVM;
+use crate::syslv::{ ProcessVM,SysLv };
 use std::ffi::CString;
 use winapi::um::winuser::FindWindowA;
 use winapi::um::winuser::FindWindowExA;
@@ -34,4 +34,29 @@ fn test_processVM()
     assert_eq!(rect2.right,2);
     assert_eq!(rect2.top,3);
     assert_eq!(rect2.bottom,4);
+}
+
+use std::result::Result;
+use std::result::Result::{Ok};
+
+#[test]
+fn test_sys_lv()
+{
+    let sys_lv = SysLv::new();
+    sys_lv.set_item_pos_center(0,0,0);
+    if let Ok(v) = sys_lv.get_item_pos_center(0){
+        assert_eq!(v.x,0);
+        assert_eq!(v.y,0);
+    }
+    sys_lv.set_item_pos_center(0,200,200);
+    if let Ok(v) = sys_lv.get_item_pos_center(0){
+        assert_eq!(v.x,200);
+        assert_eq!(v.y,200);
+    }
+    sys_lv.set_item_pos_center(0,330,440);
+    if let Ok(v) = sys_lv.get_item_pos_center(0){
+
+        assert_eq!(v.x,330);
+        assert_eq!(v.y,440);
+    }
 }
