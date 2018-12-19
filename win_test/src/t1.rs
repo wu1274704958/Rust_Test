@@ -57,29 +57,29 @@ pub fn test(){
 
 
     let p1 = Point2d::new(w_half, h_half * 0.6);
-    let p1_ctrl = Point2d::new( p1.x - w * 0.2 , p1.y - h * 0.5);
+    let p1_ctrl = Point2d::new( p1.x - w * 0.15 , p1.y - h * 0.6);
 
     let p2 = Point2d::new(w_half *  0.3, h_half * 0.3);
-    let p2_ctrl = Point2d::new( p2.x + w * 0.001 , p2.y + h * 0.2);
+    let p2_ctrl = Point2d::new( p2.x - w * 0.06 , p2.y + h * 0.1);
 
     let p3 = Point2d::new(p2.x ,p2.y );
-    let p3_ctrl = Point2d::new( p3.x - w * 0.15 , p3.y + h * 0.3);
+    let p3_ctrl = Point2d::new( p3.x - w * 0.2 , p3.y + h * 0.3);
 
-    let p4 = Point2d::new(w_half * 0.76 , h * 0.9 );
-    let p4_ctrl = Point2d::new( p4.x + w * 0.15 , p4.y + h * 0.1);
+    let p4= Point2d::new(w_half * 1.05  , h);
+    let p4_ctrl = Point2d::new( p4.x - w * 0.07 , p4.y + h * 0.05);
 
     let curve: Bez3o<f32> = Bez3o::new(
         p1,
         p1_ctrl,
-        p2,
-        p2_ctrl
+        p2_ctrl,
+        p2
     );
 
     let curve2: Bez3o<f32> = Bez3o::new(
         p3,
         p3_ctrl,
-        p4,
-        p4_ctrl
+        p4_ctrl,
+        p4
     );
 
 //    let curve3: Bez3o<f32> = Bez3o::new(
