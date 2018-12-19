@@ -6,6 +6,8 @@ use crate::transform::{ Vec2,Mat2};
 use crate::t1::create_item;
 use std::fs::remove_file;
 
+const OneByOne:bool = true;
+
 pub fn test()
 {
     let tween_vec = {
@@ -126,12 +128,21 @@ pub fn test()
         from.push(sys_lv.get_item_pos_center(i as usize).ok().unwrap().into());
     }
 
-    for n in tween_vec{
-        for i in 0..sys_lv.size() as usize{
-            let offset = points[i] - from[i];
-            sys_lv.set_item_pos_center(i,(from[i].x + (offset.x * n.y)) as i32,(from[i].y + (offset.y * n.y)) as i32);
+    if !OneByOne {
+        for n in tween_vec {
+            for i in 0..sys_lv.size() as usize {
+                let offset = points[i] - from[i];
+                sys_lv.set_item_pos_center(i, (from[i].x + (offset.x * n.y)) as i32, (from[i].y + (offset.y * n.y)) as i32);
+            }
         }
-      //  sleep(Duration::from_millis(2));
+    }else{
+        for i in 0..sys_lv.size() as usize {
+            let offset = points[i] - from[i];
+            for n in tween_vec.iter() {
+                sys_lv.set_item_pos_center(i, (from[i].x + (offset.x * n.y)) as i32, (from[i].y + (offset.y * n.y)) as i32);
+                sleep(Duration::from_millis(9));
+            }
+        }
     }
 
     sleep(Duration::from_secs(5));
