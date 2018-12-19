@@ -6,7 +6,7 @@ use crate::transform::{ Vec2,Mat2};
 use crate::t1::create_item;
 use std::fs::remove_file;
 
-const OneByOne:bool = true;
+const OneByOne:bool = false;
 
 pub fn test()
 {
@@ -33,6 +33,8 @@ pub fn test()
                 t += zl;
             }
         }
+        let last = res.len() - 1;
+        res[last].y = 1.0f32;
         res
     };
 
