@@ -75,6 +75,7 @@ impl Drop for ProcessVM{
 
 use std::collections::HashMap;
 use std::cell::RefCell;
+use std::result::Result;
 
 pub struct SysLv{
     hwnd            : HWND,
@@ -121,27 +122,32 @@ impl SysLv {
         unsafe { SendMessageA(hwnd,LVM_GETITEMCOUNT,0,0) as u32 }
     }
     pub fn set_item_pos(&self,index:usize,x:i32,y:i32){
+        if index >= self.item_num as usize { return; }
         unsafe { SendMessageA(self.hwnd,LVM_SETITEMPOSITION,index,MAKE_LPARAM!(x,y) as isize) };
     }
-    pub fn get_item_pos(&self,index:usize) -> POINT
+    pub fn get_item_pos(&self,index:usize) -> Result<POINT,&'static str>
     {
+        if index >= self.item_num as usize { return Result::Err("Out of bound!!!"); }
         let mut ret = POINT{x:0,y:0};
 
         unsafe {
            SendMessageA(self.hwnd,LVM_GETITEMPOSITION,index,transmute( self.processVM.ptr) );
         };
-        self.processVM.read(&mut ret);
-        ret
+        if !self.processVM.read(&mut ret) {
+            return Result::Err("Read Process Memory Failed!!!");
+        }
+        Result::Ok(ret)
     }
 
-    pub fn set_item_pos_center(&self,index:usize,x:i32,y:i32){
+    pub fn set_item_pos_center(&self,index:usize,x:i32,y:i32)->Result<(),&'static str> {
+        if index >= self.item_num as usize { return Result::Ok(()); }
         let mut offsets = self.offsets.borrow_mut();
         let offset:(i16,i16,u16,u16) = {
             if offsets.contains_key(&(index as u32)) {
                 offsets.get(&(index as u32)).unwrap().clone()
             }else{
-                let rect = self.get_item_rect(index,0);
-                let pos = self.get_item_pos(index);
+                let rect = self.get_item_rect(index,0)?;
+                let pos = self.get_item_pos(index)?;
                 let half_w = (rect.right - rect.left).abs() / 2;
                 let half_h = (rect.bottom - rect.top).abs() / 2;
                 let offsetx = if pos.x < 0 && rect.left < 0 {
@@ -165,17 +171,23 @@ impl SysLv {
 //        println!("{} {} ",offsetx,offsety);
 //        unsafe { SendMessageA(self.hwnd,LVM_SETITEMPOSITION,index,MAKE_LPARAM!(x - half_w + offsetx , y - half_h + offsety) as isize) };
         unsafe { SendMessageA(self.hwnd,LVM_SETITEMPOSITION,index,MAKE_LPARAM!(x - offset.2 as i32 + offset.0 as i32, y - offset.3 as i32 + offset.1 as i32) as isize) };
+        Result::Ok(())
     }
 
-    pub fn get_item_rect(&self,index:usize,r#type:u32) -> RECT
+    pub fn get_item_rect(&self,index:usize,r#type:u32) -> Result<RECT,&'static str>
     {
+        if index >= self.item_num as usize { return Result::Err("Out of bound!!!"); }
         let mut ret: RECT = RECT{left:r#type as i32,right:0,top:0,bottom:0};
-        self.processVM.write(ret);
+        if !self.processVM.write(ret) {
+            return Result::Err("Write Process Memory Failed!!!");
+        }
         unsafe {
             SendMessageA(self.hwnd,LVM_GETITEMRECT,index,transmute( self.processVM.ptr) );
         };
-        self.processVM.read(&mut ret);
-        ret
+        if !self.processVM.read(&mut ret) {
+            return Result::Err("Read Process Memory Failed!!!");
+        }
+        Result::Ok(ret)
     }
 
     fn find_hwnd() -> HWND{
@@ -214,7 +226,7 @@ impl <'a> ItemStateStore<'a>
     {
         let mut pervious = Vec::new();
         for i in 0..sys_lv.size(){
-            pervious.push(sys_lv.get_item_pos(i as usize));
+            pervious.push(sys_lv.get_item_pos(i as usize).ok().unwrap());
         }
         ItemStateStore{pervious,sys_lv}
     }
