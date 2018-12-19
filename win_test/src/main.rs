@@ -6,10 +6,11 @@ mod tests;
 mod syslv;
 mod transform;
 mod t1;
+mod t2;
 
 
 
 fn main()
 {
-    t1::test();
+    t2::test();
 }

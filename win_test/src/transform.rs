@@ -1,5 +1,8 @@
 use std::fmt::{ Display,Formatter,Error};
 use core::ops::{ Add, Sub};
+#[cfg(target_os = "windows")]
+use winapi::shared::windef::POINT;
+
 #[derive(Clone,Copy)]
 pub struct Vec2{
     pub x:f32,
@@ -71,7 +74,12 @@ impl Sub for Vec2{
         Vec2::new(self.x - rhs.x ,self.y - rhs.y)
     }
 }
-
+#[cfg(target_os = "windows")]
+impl From<POINT> for Vec2{
+    fn from(p: POINT) -> Self {
+        Vec2{x:p.x as f32,y:p.y as f32}
+    }
+}
 
 
 use std::fmt::Debug;
