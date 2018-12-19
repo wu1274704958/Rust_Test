@@ -48,7 +48,7 @@ impl Vec2{
         Vec2::new(n * self.x,n * self.y)
     }
 }
-
+#[allow(unused_must_use)]
 impl Display for Vec2{
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f,"x = {},y = {}",self.x,self.y);
@@ -129,7 +129,7 @@ impl Mul<Vec2> for Mat2{
         }
     }
 }
-
+#[allow(unused_must_use)]
 impl Debug for Mat2{
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         write!(f,"┌\t\t\t┐\n\

@@ -39,7 +39,7 @@ fn create_item(n:u32)-> Vec<PathBuf>{
 pub fn test(){
     let sys_lv = SysLv::new();
 
-    let itemStateStore = ItemStateStore::new(&sys_lv);
+    let _itemStateStore = ItemStateStore::new(&sys_lv);
 
     let fs = if sys_lv.size() < 60 {
         let fs = create_item(60 - sys_lv.size());
@@ -141,7 +141,7 @@ pub fn test(){
 
     println!("size = {}",points.len());
     let mut scale = 1.2f32;
-    let mut angle = 0.0f32;
+//    let mut angle = 0.0f32;
     let mut points_curr:Vec<Vec2> = Vec::new();
     points_curr.reserve(60);
     loop {
@@ -157,7 +157,7 @@ pub fn test(){
             sys_lv.set_item_pos_center(i ,points_curr[i].x as i32 ,points_curr[i].y as i32);
         }
 
-        angle += 0.01f32;
+//        angle += 0.01f32;
         scale -= 0.01f32;
     }
 
