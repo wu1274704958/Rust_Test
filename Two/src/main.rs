@@ -3,9 +3,8 @@
 #![allow(unused_must_use)]
 
 mod t1;
-
+#[macro_use]
 mod tup_macro;
-
 
 mod t2 {
     use std::mem;
@@ -903,9 +902,24 @@ mod t18{
     }
 }
 
+mod t19{
+    use GenTupCat::gen_tup_cat;
+    use crate::tup_macro::{tup_cat};
+
+    gen_tup_cat!(6);
+
+    pub fn test(){
+        let a_= (7,8);
+        let b = 9.0f32;
+        let c = tup_cat(a_,b);
+        println!("{:?}",c);
+        println!("{}",tup_get!(c,2));
+        println!("{}",a);
+    }
+}
 fn main() {
 //    if cfg!(target_os = "windows") {
 ////        t14::test();
 ////    }
-    t18::test();
+    t19::test();
 }

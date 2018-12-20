@@ -1,0 +1,13 @@
+[package]
+name = "GenTupCat"
+version = "0.1.0"
+authors = ["wu1274704958 <1274704958@qq.com>"]
+edition = "2018"
+
+[lib]
+proc_macro = true
+
+[dependencies]
+quote = "0.6"
+syn = {version = "0.15"}
+proc-macro2="0.4"
