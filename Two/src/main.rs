@@ -161,7 +161,7 @@ mod t7{
         println!("{}",a);
         println!("{}",b);
 
-    
+
         println!("{}", mem::size_of::<RefCell<i32>>());
 
         unsafe { println!("{}",getpid());}
@@ -572,39 +572,40 @@ mod t12{
         assert_eq!( findMedianSortedArrays(vec![1,3],vec![2]),2.0 ,"assert failed!");
     }
 }
-
+#[cfg(test)]
 mod t13{
 
-    fn convert(s:&Vec<u8>,r:usize) -> Vec<u8>
+    fn convert(st: String, num_rows: i32) -> String
     {
-        if r == 1 { return s.clone(); }
-        let cycle_len = r * 2 - 2;
-        let mut ret:Vec<u8> = Vec::new();
-        let len = s.len();
-
+        if num_rows == 1 { return st; }
+        let cycle_len = (num_rows * 2 - 2) as usize;
+        let mut ret = String::new();
+        let len = st.len();
+        let s = st.as_bytes();
         let mut i = 0usize;
+        let num_rows = num_rows as usize;
         loop {
-            if i >= r {break;}
+            if i >= num_rows {break;}
             let mut j = 0usize;
             loop {
                 if j + i >= len {break;}
-                ret.push( s[j + i]);
-                if i != 0 && i != r - 1 && j + cycle_len - i < len{
-                    ret.push(s[j + cycle_len - i]);
+                ret.push( s[j + i] as char);
+                if i != 0 && i != num_rows - 1 && j + cycle_len - i < len{
+                    ret.push(s[j + cycle_len - i] as char);
                 }
                 j += cycle_len;
             }
             i += 1;
         }
-        ret
+        ret.into()
     }
-
+    #[test]
     pub fn test(){
         //a e i
         //bdfh
         //c g
-        assert_eq!( convert(    &vec![b'A',b'B',b'C',b'D',b'E',b'F',b'G',b'H',b'I'],3),
-                                    vec![b'A',b'E',b'I',b'B',b'D',b'F',b'H',b'C',b'G'] ,"assert failed!");
+        assert_eq!( convert(   "LEETCODEISHIRING".to_string() ,4),
+                                    "LDREOEIIECIHNTSG".to_string() ,"assert failed!");
     }
 }
 
