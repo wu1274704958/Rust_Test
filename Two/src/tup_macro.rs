@@ -1,3 +1,9 @@
+use GenTupCat::gen_tup_cat;
+
+pub trait CatOne<T> {
+    type Ret;
+    fn cat(self,o:T) ->Self::Ret;
+}
 
 #[macro_export]
 macro_rules! tup_get {
@@ -6,7 +12,9 @@ macro_rules! tup_get {
     };
 }
 
-pub fn tup_cat<T,T2>(t:(T,T),t2:T2) -> (T,T,T2)
-{
-    (t.0,t.1,t2)
-}
+gen_tup_cat!(2);
+gen_tup_cat!(3);
+gen_tup_cat!(4);
+gen_tup_cat!(5);
+gen_tup_cat!(6);
+

@@ -903,18 +903,16 @@ mod t18{
 }
 
 mod t19{
-    use GenTupCat::gen_tup_cat;
-    use crate::tup_macro::{tup_cat};
 
-    gen_tup_cat!(6);
+    //use crate::tup_macro::{tup_cat};
+    use crate::tup_macro::CatOne;
 
     pub fn test(){
-        let a_= (7,8);
-        let b = 9.0f32;
-        let c = tup_cat(a_,b);
-        println!("{:?}",c);
-        println!("{}",tup_get!(c,2));
-        println!("{}",a);
+        let a= (7,8);
+        let e = a.cat(1.0f32).cat("abc").cat(Box::new(45)).cat(String::from("fuck"));
+        println!("{:?}",e);
+
+        println!("{}",tup_get!(a,1));
     }
 }
 fn main() {
