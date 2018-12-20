@@ -6,8 +6,9 @@ use crate::transform::{ Vec2,Mat2};
 use crate::t1::create_item;
 use std::fs::remove_file;
 
-const OneByOne:bool = false;
+const ONE_BY_ONE:bool = false;
 
+#[allow(unused_must_use)]
 pub fn test()
 {
     let tween_vec = {
@@ -120,7 +121,7 @@ pub fn test()
     }
 
     points.iter_mut().for_each(|it| {
-       let mut new = (Mat2::from_scale(Vec2::new(0.8f32,0.8f32)) * (*it - half)) + half;
+       let new = (Mat2::from_scale(Vec2::new(0.8f32,0.8f32)) * (*it - half)) + half;
         *it = new;
     });
 
@@ -129,14 +130,26 @@ pub fn test()
     for i in 0..sys_lv.size(){
         from.push(sys_lv.get_item_pos_center(i as usize).ok().unwrap().into());
     }
-
-    if !OneByOne {
-        for n in tween_vec {
-            for i in 0..sys_lv.size() as usize {
-                let offset = points[i] - from[i];
-                sys_lv.set_item_pos_center(i, (from[i].x + (offset.x * n.y)) as i32, (from[i].y + (offset.y * n.y)) as i32);
-            }
+    let mut b = 0usize;
+    let len = 3usize;
+    if !ONE_BY_ONE {
+        'wai:loop {
+            if b >= sys_lv.size() as usize { break; }
+                for n in tween_vec.iter() {
+                    let mut i = 0;
+                    loop {
+                        if i >= len { break; }
+                        let curr = b + i;
+                        if curr >= sys_lv.size() as usize { break 'wai; }
+                        let offset = points[curr] - from[curr];
+                        sys_lv.set_item_pos_center(curr, (from[curr].x + (offset.x * n.y)) as i32, (from[curr].y + (offset.y * n.y)) as i32);
+                        i += 1;
+                    }
+                    sleep(Duration::from_millis(9));
+                }
+            b += len;
         }
+
     }else{
         for i in 0..sys_lv.size() as usize {
             let offset = points[i] - from[i];
@@ -147,7 +160,7 @@ pub fn test()
         }
     }
 
-    sleep(Duration::from_secs(5));
+    sleep(Duration::from_secs(2));
 
     fs.iter().for_each(|f|{
         remove_file(f.as_path());
