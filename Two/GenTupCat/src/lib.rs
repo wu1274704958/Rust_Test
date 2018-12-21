@@ -177,11 +177,53 @@ pub fn gen_tup_sub(input: TokenStream) -> TokenStream{
     tokens.into()
 }
 
+//impl<T1,T2,E1,E2> CatTup<(E1,E2)> for (T1,T2)
+//{
+//    type Ret = (T1,T2,E1,E2);
+//    #[inline]
+//    fn cat(self, o: (E1,E2)) -> Self::Ret {
+//        (self.0,self.1,o.0,o.1)
+//    }
+//}
+//
+//impl<T1,T2,E1,E2,E3> CatTup<(E1,E2,E3)> for (T1,T2)
+//{
+//    type Ret = (T1,T2,E1,E2,E3);
+//    #[inline]
+//    fn cat(self, o: (E1,E2,E3)) -> Self::Ret {
+//        (self.0,self.1,o.0,o.1,o.2)
+//    }
+//}
+
 // impl 2 for 2
 #[proc_macro]
 pub fn gen_tup_cat_tup(input: TokenStream) -> TokenStream {
-
     let in_tokens:String = input.to_string();
-    //let
+    let temps:Vec<&str> = in_tokens.split("impl").collect();
+    let ss:Vec<&str> = temps[1].split("for").collect();
 
+    let impl_t_n = u32::from_str(ss[0].trim()).unwrap();
+    let for_t_n = u32::from_str(ss[1].trim()).unwrap();
+
+    if impl_t_n < 2 { panic!("impl type num must > 1"); }
+    if for_t_n < 2 { panic!("tuple len must > 1"); }
+
+    let impl_ts = IndexSequenceNoFS!(impl_t_n,,,E);
+    let impl_vs = IndexSequenceWithFS!(impl_t_n,,,o.);
+
+    let for_ts = IndexSequenceNoFS!(for_t_n,,,T);
+    let for_vs = IndexSequenceWithFS!(for_t_n,,,self.);
+
+    let tokens = quote!{
+        impl<#for_ts,#impl_ts> CatTup<(#impl_ts)> for (#for_ts)
+        {
+            type Ret = (#for_ts,#impl_ts);
+            #[inline]
+            fn cat(self, o: (#impl_ts)) -> Self::Ret {
+                (#for_vs #impl_vs)
+            }
+        }
+    };
+    //println!("{}",tokens.to_string());
+    tokens.into()
 }

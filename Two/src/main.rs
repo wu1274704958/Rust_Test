@@ -905,24 +905,25 @@ mod t18{
 mod t19{
 
     //use crate::tup_macro::{tup_cat};
-    use crate::tup_macro::{TupSub,CatItem,CatTup};
+    use crate::tup_macro::{TupSub,CatItem,CatTup,TupPrint};
 
     pub fn test(){
         let a= (7,8);
         let e = a.cat_item(Box::new(45))
             .sub()
             .cat((99,100))
-            .sub().sub()
+            .sub()
+            .sub()
             .cat((1,2,3))
-        ;
-//            .cat(String::from("fuck"));
-//            .cat((8.9, 1usize));
-//            .cat1("hello")
-//            .cat2((99,100))
-//            .cat3((110,120.90,3.1415926f32));
+            .cat_item(String::from("fuck"))
+            .cat((8.9, 1usize))
+            .cat_item("hello")
+            .cat((99,100))
+            .cat((110,120.90,3.1415926f32));
 
-        println!("{:?}",e);
-        println!("{}",tup_get!(a,1));
+//        println!("{:?}",e); //太长
+        e.print();
+        println!("{}",tup_get!(e,12));
     }
 }
 fn main() {
