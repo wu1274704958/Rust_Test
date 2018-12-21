@@ -903,7 +903,6 @@ mod t18{
 }
 
 mod t19{
-
     //use crate::tup_macro::{tup_cat};
     use crate::tup_macro::{TupSub,CatItem,CatTup,TupPrint};
 
@@ -924,6 +923,9 @@ mod t19{
 //        println!("{:?}",e); //太长
         e.print();
         println!("{}",tup_get!(e,12));
+
+        let d = e.sub();
+        d.print();
     }
 }
 fn main() {

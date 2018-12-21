@@ -1,7 +1,5 @@
-use GenTupCat::{gen_tup_cat_item,gen_tup_sub,gen_tup_cat_tup};
+use GenTupCat::{gen_tup_cat_item,gen_tup_sub,gen_tup_cat_tup,gen_tup_print};
 use std::fmt::Debug;
-use std::fmt::Formatter;
-
 pub trait CatItem<E> {
     type Ret;
     fn cat_item(self,o:E) -> Self::Ret;
@@ -21,27 +19,13 @@ pub trait TupPrint {
     fn print(&self);
 }
 
-impl<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> TupPrint for (T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14)
-where T1:Debug,
-      T2:Debug,
-      T3:Debug,
-      T4:Debug,
-      T5:Debug,
-      T6:Debug,
-      T7:Debug,
-      T8:Debug,
-      T9:Debug,
-      T10:Debug,
-      T11:Debug,
-      T12:Debug,
-      T13:Debug,
-      T14:Debug
-{
-    fn print(&self) {
-        println!("({:?},{:?},{:?},{:?},{:?},{:?},{:?},{:?},{:?},{:?},{:?},{:?},{:?},{:?})",
-        self.0,self.1,self.2,self.3,self.4,self.5,self.6,self.7,self.8,self.9,self.10,self.11,self.12,self.13);
-    }
-}
+gen_tup_print!(13);
+gen_tup_print!(14);
+gen_tup_print!(15);
+gen_tup_print!(16);
+gen_tup_print!(17);
+gen_tup_print!(18);
+
 
 gen_tup_cat_item!(2);
 gen_tup_cat_item!(3);

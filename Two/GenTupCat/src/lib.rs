@@ -227,3 +227,46 @@ pub fn gen_tup_cat_tup(input: TokenStream) -> TokenStream {
     //println!("{}",tokens.to_string());
     tokens.into()
 }
+
+#[proc_macro]
+pub fn gen_tup_print(input: TokenStream) -> TokenStream {
+    let tup_len_str:String = input.to_string();
+    let tup_len:u32 = u32::from_str(tup_len_str.trim()).ok().unwrap();
+    if tup_len < 2 { panic!("tuple len must > 1"); }
+
+    let ts = IndexSequenceNoFS!(tup_len,,,T);
+
+    let vs = IndexSequenceNoFS!(tup_len,,,self.);
+
+    let mut fmtstr = String::new();
+    fmtstr.push('(');
+    for n in 0..tup_len{
+        fmtstr.push_str("{:?}");
+        if n < tup_len - 1 { fmtstr.push(','); }
+    }
+    fmtstr.push(')');
+
+    let mut wherestr = String::new();
+
+    for n in 0..tup_len{
+        wherestr.push_str(format!("T{}:Debug",n).as_str());
+        if n < tup_len - 1 { wherestr.push(','); }
+    }
+
+    let where_ :proc_macro2::TokenStream = wherestr.parse().unwrap();
+
+    let tokens = quote!{
+        impl<#ts> TupPrint for (#ts)
+        where #where_
+        {
+            fn print(&self) {
+                println!(#fmtstr,#vs);
+            }
+        }
+    };
+
+    //println!("{}",tokens.to_string());
+
+    tokens.into()
+
+}
