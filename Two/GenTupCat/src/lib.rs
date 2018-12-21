@@ -1,46 +1,187 @@
 extern crate proc_macro;
 
 use {
-    syn::{parse_macro_input,Token,DeriveInput,AttributeArgs},
+    //syn::{parse_macro_input,Token,DeriveInput,AttributeArgs},
     quote::*,
     proc_macro2,
     self::proc_macro::TokenStream
 };
 
 use std::str::FromStr;
+
+//FS => Final separator 最后的分隔符
+macro_rules! IndexSequenceNoFS {
+    ($n:ident,$f:tt,$($head:tt)*) => {
+        {
+            let mut ts = String::new();
+            for n in 0..$n {
+                ts.push_str(format!("{}{}",stringify!($($head)*),n).as_str() );
+                if n != $n - 1{
+                    ts.push_str(format!("{}",stringify!($f)).as_str());
+                }
+            }
+            let ts_:proc_macro2::TokenStream = ts.parse().unwrap();
+            ts_
+        }
+    };
+}
+
+//FS => Final separator 最后的分隔符
+macro_rules! IndexSequenceWithFS {
+    ($n:ident,$f:tt,$($head:tt)*) => {
+        {
+            let mut ts = String::new();
+            for n in 0..$n {
+                ts.push_str(format!("{}{}{}",stringify!($($head)*),n,stringify!($f)).as_str() );
+            }
+            let ts_:proc_macro2::TokenStream = ts.parse().unwrap();
+            ts_
+        }
+    };
+}
+
+const name_arr:[&'static str;5] = ["One","Two","Three","Four","Five"];
+
+
+#[proc_macro]
+pub fn gen_tup_trait(input: TokenStream) -> TokenStream
+{
+    let max_n = name_arr.len();
+    let _input:String = input.to_string();
+    let mut num:usize = usize::from_str(_input.as_str()).ok().unwrap();
+    let ty_num = num;
+    num -= 1;
+    if num > max_n { panic!("num > {}",max_n); }
+    let name:proc_macro2::TokenStream = format!("Cat{}",name_arr[num]).parse().unwrap();
+    let ts = IndexSequenceNoFS!(ty_num,,,E);
+
+    let func_name:proc_macro2::TokenStream = format!("cat{}",ty_num).parse().unwrap();
+
+    let tokens = if ty_num <= 1 {
+        quote! {
+            pub trait #name<#ts> {
+                type Ret;
+                fn #func_name(self,o:#ts) ->Self::Ret;
+            }
+        }
+    }else{
+        quote! {
+            pub trait #name<#ts> {
+                type Ret;
+                fn #func_name(self,o:(#ts)) ->Self::Ret;
+            }
+        }
+    };
+    //println!("{}",tokens.to_string());
+    tokens.into()
+}
+
 #[proc_macro]
 pub fn gen_tup_cat(input: TokenStream) -> TokenStream
 {
+    let max_n = name_arr.len();
     let _input:String = input.to_string();
-    let ty_num:u32 = u32::from_str(_input.as_str()).ok().unwrap();
+    let strs:Vec<&str> = _input.split("cat").collect();
+    let left = strs[0].trim();
+    let right = strs[1].trim();
 
-    let mut ts = String::new();
-    for n in 0..ty_num {
-        ts.push_str(format!("T{}",n).as_str() );
-        if n != ty_num - 1{
-            ts.push(',');
+    let for_ty_num:u32 = u32::from_str(left).ok().unwrap();
+    let cat_ty_num:u32 = u32::from_str(right).ok().unwrap();
+
+    let n_index = (cat_ty_num - 1) as usize;
+    if n_index > max_n { panic!("num > {}",max_n); }
+    let name:proc_macro2::TokenStream = format!("Cat{}",name_arr[n_index]).parse().unwrap();
+
+    let func_name:proc_macro2::TokenStream = format!("cat{}",cat_ty_num).parse().unwrap();
+
+    let fts_ = IndexSequenceNoFS!(for_ty_num,,,T);
+
+    let fvs_ = IndexSequenceWithFS!(for_ty_num,,,self.);
+
+    let cts_ = IndexSequenceNoFS!(cat_ty_num,,,E);
+
+    let cvs_ = IndexSequenceNoFS!(cat_ty_num,,,o.);
+
+    let tokens = if cat_ty_num <= 1 {
+        quote! {
+            impl <#fts_,#cts_>#name<#cts_> for (#fts_) {
+                type Ret = (#fts_,#cts_);
+
+                fn #func_name(self, o: #cts_) -> Self::Ret {
+                    (#fvs_ o)
+                }
+            }
         }
-    }
+    } else{
+        quote! {
+            impl <#fts_,#cts_>#name<#cts_> for (#fts_) {
+                type Ret = (#fts_,#cts_);
 
-    let ts_:proc_macro2::TokenStream = ts.parse().unwrap();
+                fn #func_name(self, o: (#cts_)) -> Self::Ret {
+                    (#fvs_ #cvs_)
+                }
+            }
+        }
+    };
+    //println!("{:?}",tokens.to_string());
+    tokens.into()
+}
 
-    let mut vs = String::new();
-    for n in 0..ty_num {
-        vs.push_str(format!("self.{},",n).as_str() );
-    }
-    let vs_:proc_macro2::TokenStream = vs.parse().unwrap();
+#[proc_macro]
+pub fn gen_tup_cat_item(input: TokenStream) -> TokenStream{
+    let tup_len_str:String = input.to_string();
+    let tup_len:u32 = u32::from_str(tup_len_str.trim()).ok().unwrap();
+    if tup_len < 2 { panic!("tuple len must > 1"); }
+
+    let ts = IndexSequenceNoFS!(tup_len,,,T);
+
+    let vs = IndexSequenceWithFS!(tup_len,,,self.);
 
     let tokens = quote!{
-        impl <#ts_,T>CatOne<T> for (#ts_) {
-            type Ret = (#ts_,T);
-
-            fn cat(self, o: T) -> Self::Ret {
-                (#vs_ o)
+        impl<#ts,E1> CatItem<E1> for (#ts)
+        {
+            type Ret = (#ts,E1);
+            #[inline]
+            fn cat_item(self,o: E1) -> Self::Ret{
+                (#vs o)
             }
         }
     };
 
-    //println!("{:?}",tokens.to_string());
+    tokens.into()
+}
+
+#[proc_macro]
+pub fn gen_tup_sub(input: TokenStream) -> TokenStream{
+    let tup_len_str:String = input.to_string();
+    let tup_len:u32 = u32::from_str(tup_len_str.trim()).ok().unwrap();
+    if tup_len < 3 { panic!("tuple len must > 2"); }
+    let len_sub_1 = tup_len - 1;
+
+    let ts = IndexSequenceNoFS!(tup_len,,,T);
+
+    let ts_sub_1 = IndexSequenceNoFS!(len_sub_1,,,T);
+
+    let vs = IndexSequenceNoFS!(len_sub_1,,,self.);
+
+    let tokens = quote!{
+        impl<#ts> TupSub for (#ts){
+            type Ret = (#ts_sub_1);
+
+            fn sub(self) -> Self::Ret {
+                (#vs)
+            }
+        }
+    };
 
     tokens.into()
+}
+
+// impl 2 for 2
+#[proc_macro]
+pub fn gen_tup_cat_tup(input: TokenStream) -> TokenStream {
+
+    let in_tokens:String = input.to_string();
+    //let
+
 }
