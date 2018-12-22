@@ -5,12 +5,82 @@ use core::time::Duration;
 use crate::transform::{ Vec2,Mat2};
 use crate::t1::create_item;
 use std::fs::remove_file;
+use std::env;
+use std::str::FromStr;
+use std::fs::File;
 
 const ONE_BY_ONE:bool = false;
 
 #[allow(unused_must_use)]
 pub fn test()
 {
+    let mut n_for_time:u32 = 0;
+    let mut is_clean = false;
+    let mut is_auto_remove = true;
+    let mut is_reduction = true;
+    let mut print_help = false;
+    let mut only_del = false;
+    let mut only_reduction = false;
+
+    let mut stage = 0;
+    env::args().for_each(|it|{
+        if stage != 0 {
+            match stage {
+                1 => {
+                    n_for_time = if let Some(res) = u32::from_str(it.as_str()).ok() {
+                        res
+                    } else {
+                        panic!("Input Resolution Failure!!! {} ", it)
+                    }
+                },
+                _ => {}
+            }
+            stage = 0;
+        }else{
+            match it.as_str() {
+                "-n" => stage = 1,
+                "-c" => is_clean = true,
+                "-r" => is_reduction = false,
+                "-a" => is_auto_remove = false,
+                "-h" => print_help = true,
+                "-od" => only_del = true,
+                "-or" => only_reduction = true,
+                _ => {}
+            }
+        }
+    });
+
+    if n_for_time == 0 {n_for_time = 3};
+    if n_for_time > 60 { println!("Item num must <= 60"); }
+    if print_help {
+        println!("--------------------------- Help ---------------------------\n\
+  选项说明（以下选项都是可选的）
+\t-n 后加数字 1 ~ 60 表示一次移动Item的数量（数字是必须的）默认是3。\n\
+\t-c 开始前清理所有桌面图标，默认不清理。\n\
+\t-r 结束后不回复图标位置，默认恢复。\n\
+\t-a 结束后不自动删除临时占位图标，默认自动删除。\n\
+\t-h 打印帮助。\n\
+\t-od 只删除最近一次自动创建的占位图标。\n\
+\t-or 只回复最近一次图标的位置。\n\
+  Tip：使用前请关闭“自动排列图标”及“将图标与网格对其选项”。");
+        return;
+    }
+
+    if only_reduction && only_del{
+
+        return;
+    }
+
+    if only_del{
+
+        return;
+    }
+
+    if only_reduction{
+
+        return;
+    }
+
     let tween_vec = {
         let curve: Bez3o<f32> = Bez3o::new(
             Point2d::new(0.0    ,0.0),
@@ -40,7 +110,6 @@ pub fn test()
     };
 
     let sys_lv = SysLv::new();
-    let _itemStateStore = ItemStateStore::new(&sys_lv);
 
 
     let fs = if sys_lv.size() < 60 {
@@ -52,6 +121,18 @@ pub fn test()
         vec![]
     };
 
+
+    let _itemStateStore = if is_reduction {
+        Some(ItemStateStore::new(&sys_lv))
+    }else{
+        None
+    };
+
+    if is_clean{
+        for n in 0..sys_lv.size(){
+            sys_lv.set_item_pos(n as usize,-100,-100);
+        }
+    }
 
 
     let w = sys_lv.W as f32;
@@ -131,7 +212,7 @@ pub fn test()
         from.push(sys_lv.get_item_pos_center(i as usize).ok().unwrap().into());
     }
     let mut b = 0usize;
-    let len = 3usize;
+    let len = n_for_time as usize;
     if !ONE_BY_ONE {
         'wai:loop {
             if b >= sys_lv.size() as usize { break; }
@@ -140,7 +221,7 @@ pub fn test()
                     loop {
                         if i >= len { break; }
                         let curr = b + i;
-                        if curr >= sys_lv.size() as usize { break 'wai; }
+                        if curr >= sys_lv.size() as usize { break; }
                         let offset = points[curr] - from[curr];
                         sys_lv.set_item_pos_center(curr, (from[curr].x + (offset.x * n.y)) as i32, (from[curr].y + (offset.y * n.y)) as i32);
                         i += 1;
@@ -162,9 +243,15 @@ pub fn test()
 
     sleep(Duration::from_secs(2));
 
-    fs.iter().for_each(|f|{
-        remove_file(f.as_path());
-    });
+    if is_auto_remove {
+        fs.iter().for_each(|f| {
+            remove_file(f.as_path());
+        });
+    }/*else{
+        let config = File::create("./config");
+        if config
+    }*/
+
     sleep(Duration::from_secs(2));
 
 }
