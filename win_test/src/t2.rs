@@ -8,19 +8,28 @@ use std::fs::remove_file;
 use std::env;
 use std::str::FromStr;
 use std::fs::File;
+use std::path::{PathBuf,Path};
+use std::io::{Write,Read};
+use winapi::shared::windef::POINT;
 
 const ONE_BY_ONE:bool = false;
+
+macro_rules! dp {
+    ($a:ident) => {
+        println!("{} = {:?}",stringify!($a),$a);
+    };
+}
 
 #[allow(unused_must_use)]
 pub fn test()
 {
-    let mut n_for_time:u32 = 0;
-    let mut is_clean = false;
-    let mut is_auto_remove = true;
-    let mut is_reduction = true;
-    let mut print_help = false;
-    let mut only_del = false;
-    let mut only_reduction = false;
+    let mut n_for_time              :u32 = 0;
+    let mut is_clean        = false;
+    let mut is_auto_remove  = true;
+    let mut is_reduction    = true;
+    let mut print_help      = false;
+    let mut only_del        = false;
+    let mut only_reduction  = false;
 
     let mut stage = 0;
     env::args().for_each(|it|{
@@ -62,22 +71,42 @@ pub fn test()
 \t-h 打印帮助。\n\
 \t-od 只删除最近一次自动创建的占位图标。\n\
 \t-or 只回复最近一次图标的位置。\n\
-  Tip：使用前请关闭“自动排列图标”及“将图标与网格对其选项”。");
+  Tip：使用前请关闭“自动排列图标”及“将图标与网格对齐”选项。");
         return;
     }
 
-    if only_reduction && only_del{
+    dp!(n_for_time    );
+    dp!(is_clean      );
+    dp!(is_auto_remove);
+    dp!(is_reduction  );
+    dp!(print_help    );
+    dp!(only_del      );
+    dp!(only_reduction);
 
+    let config = load_config();
+
+    let sys_lv = SysLv::new();
+
+    if only_reduction && only_del{
+        if let Some(config) = config {
+            del_temp_item(&config.1);
+            sleep(Duration::from_millis(2000));
+            reduction( &sys_lv,&config.0);
+        }
         return;
     }
 
     if only_del{
-
+        if let Some(config) = config {
+            del_temp_item(&config.1);
+        }
         return;
     }
 
     if only_reduction{
-
+        if let Some(config) = config {
+            reduction(&sys_lv,&config.0);
+        }
         return;
     }
 
@@ -109,8 +138,6 @@ pub fn test()
         res
     };
 
-    let sys_lv = SysLv::new();
-
 
     let fs = if sys_lv.size() < 60 {
         let fs = create_item(60 - sys_lv.size());
@@ -121,12 +148,8 @@ pub fn test()
         vec![]
     };
 
-
-    let _itemStateStore = if is_reduction {
-        Some(ItemStateStore::new(&sys_lv))
-    }else{
-        None
-    };
+    let mut _itemStateStore = ItemStateStore::new(&sys_lv);
+    _itemStateStore.is_reduction = is_reduction;
 
     if is_clean{
         for n in 0..sys_lv.size(){
@@ -247,12 +270,107 @@ pub fn test()
         fs.iter().for_each(|f| {
             remove_file(f.as_path());
         });
-    }/*else{
-        let config = File::create("./config");
-        if config
-    }*/
+    }
+
+    save_config(Some(_itemStateStore.get_pervious()),&fs);
 
     sleep(Duration::from_secs(2));
 
+}
+
+const config_path :&'static str = ".\\config";
+
+pub fn save_config(pos : Option<&Vec<POINT>>,fs :&Vec<PathBuf>)
+{
+    let mut confug_file = File::create(Path::new(config_path)).ok().unwrap();
+
+    if let Some(pos_v) = pos {
+        confug_file.write(b"[Item_Pos]\r\n");
+        pos_v.iter().enumerate().for_each(|it| {
+            confug_file.write(format!("{}={},{}\r\n", it.0, it.1.x as i32, it.1.y as i32).as_bytes());
+        });
+    }
+
+    confug_file.write(b"[Item_Name]\r\n");
+    fs.iter().for_each(|it|{
+        confug_file.write(it.to_str().unwrap().as_bytes());
+        confug_file.write(b"\r\n");
+    });
+
+    confug_file.sync_all().unwrap();
+}
+
+pub fn load_config() -> Option<(Vec<Vec2>,Vec<String>)>
+{
+    let mut confug_file = File::open(Path::new(config_path));
+
+    if let Ok(ref mut f) = confug_file{
+        let mut pos:Vec<Vec2> = Vec::new();
+        let mut paths:Vec<String> = Vec::new();
+        let mut res:String = String::new();
+        pos.resize(60,Vec2::new(0f32,0f32));
+        f.read_to_string(&mut res);
+        let mut stage = 0;
+
+        res.lines().for_each(|it|{
+            if it != ""{
+                if stage != 0 {
+                    match stage {
+                        1 => {
+                            if it.starts_with("[") && it.ends_with("]") {
+                                stage = 0;
+                            }else {
+                                let arr1: Vec<&str> = it.split("=").collect();
+                                let index = usize::from_str(arr1[0]).unwrap();
+                                let arr2: Vec<&str> = arr1[1].split(",").collect();
+                                let x = i32::from_str(arr2[0]).unwrap();
+                                let y = i32::from_str(arr2[1]).unwrap();
+
+                                pos[index] = Vec2::new(x as f32, y as f32);
+                            }
+                        },
+                        2 => {
+                            if it.starts_with("[") && it.ends_with("]") {
+                                stage = 0;
+                            }else {
+                                paths.push(it.to_string());
+                            }
+                        },
+                        _ => {}
+                    }
+                }
+                if stage == 0 {
+                    match it {
+                        "[Item_Pos]" => stage = 1,
+                        "[Item_Name]" => stage = 2,
+                        _ => {}
+                    }
+                }
+            }
+        });
+
+        Some((pos,paths))
+    }else{
+        None
+    }
+}
+
+fn del_temp_item(paths:&Vec<String>)
+{
+    paths.iter().for_each(|f| {
+        //println!("{}",f);
+        remove_file(Path::new(f));
+    });
+}
+
+fn reduction(sys_lv:&SysLv,pos:&Vec<Vec2>)
+{
+    for n in 0..sys_lv.size(){
+        let i = n as usize;
+//        let vx = pos[i].x as i32;
+//        let vy = pos[i].y as i32;
+//        sys_lv.set_item_pos(i,vx,vy);
+        sys_lv.set_item_pos(i,pos[i].x as i32,pos[i].y as i32);
+    }
 }
 

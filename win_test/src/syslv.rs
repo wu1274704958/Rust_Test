@@ -247,7 +247,8 @@ use std::vec::Vec;
 pub struct ItemStateStore<'a>
 {
     pervious    :Vec<POINT>,
-    sys_lv      :&'a SysLv
+    sys_lv      :&'a SysLv,
+    pub is_reduction:bool
 }
 
 impl <'a> ItemStateStore<'a>
@@ -258,17 +259,29 @@ impl <'a> ItemStateStore<'a>
         for i in 0..sys_lv.size(){
             pervious.push(sys_lv.get_item_pos(i as usize).ok().unwrap());
         }
-        ItemStateStore{pervious,sys_lv}
+        ItemStateStore{pervious,sys_lv,is_reduction:true}
+    }
+
+    pub fn get_pervious(&self)-> &Vec<POINT>
+    {
+        &(self.pervious)
+    }
+
+    fn reduction(&self)
+    {
+        unsafe { (*self.sys_lv.as_ptr()).refresh_num(); }
+        for i in 0..self.pervious.len() {
+            if i as u32 >= self.sys_lv.size() { break; }
+            self.sys_lv.set_item_pos(i, self.pervious[i].x, self.pervious[i].y);
+        }
     }
 }
 
 impl<'a> Drop for ItemStateStore<'a>
 {
     fn drop(&mut self) {
-        unsafe { (*self.sys_lv.as_ptr()).refresh_num(); }
-        for i in 0..self.pervious.len(){
-            if i as u32 >= self.sys_lv.size() { break; }
-            self.sys_lv.set_item_pos(i,self.pervious[i].x,self.pervious[i].y);
+        if self.is_reduction {
+            self.reduction();
         }
     }
 }
