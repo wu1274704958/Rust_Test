@@ -315,28 +315,23 @@ pub fn load_config() -> Option<(Vec<Vec2>,Vec<String>)>
         res.lines().for_each(|it|{
             if it != ""{
                 if stage != 0 {
-                    match stage {
-                        1 => {
-                            if it.starts_with("[") && it.ends_with("]") {
-                                stage = 0;
-                            }else {
+                    if it.starts_with("[") && it.ends_with("]") {
+                        stage = 0;
+                    }else {
+                        match stage {
+                            1 => {
                                 let arr1: Vec<&str> = it.split("=").collect();
                                 let index = usize::from_str(arr1[0]).unwrap();
                                 let arr2: Vec<&str> = arr1[1].split(",").collect();
                                 let x = i32::from_str(arr2[0]).unwrap();
                                 let y = i32::from_str(arr2[1]).unwrap();
-
                                 pos[index] = Vec2::new(x as f32, y as f32);
-                            }
-                        },
-                        2 => {
-                            if it.starts_with("[") && it.ends_with("]") {
-                                stage = 0;
-                            }else {
+                            },
+                            2 => {
                                 paths.push(it.to_string());
-                            }
-                        },
-                        _ => {}
+                            },
+                            _ => {}
+                        }
                     }
                 }
                 if stage == 0 {
