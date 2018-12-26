@@ -928,9 +928,61 @@ mod t19{
         d.print();
     }
 }
+
+mod t20{
+
+    fn my_atoi(str: String) -> i32 {
+        if str.len() == 0 {return 0;}
+        let mut sign = false;
+        let bs = str.as_bytes();
+        let mut b = 0;
+        let mut is_negative = match bs[0] {
+            b'-' => { sign = true;b += 1;true },
+            b'+' => { sign = true;b += 1;false },
+            _ => false,
+        };
+
+        let mut res = 0;
+
+        loop{
+            if b >= str.len(){break;}
+
+            if bs[b] >= 48 && bs[b] <= 57{
+                let zl = (bs[b] - 48) as i32;
+                if (res * 10) - res < 0 || res * 10 < 0{ return -2147483648i32;}
+                res *= 10;
+
+                if (res + zl) - res < 0 || res + zl < 0 { return -2147483648i32;}//0x7FFF_FFFF
+                res += zl;
+            }else if bs[b] == b' '{
+                if sign {break;}
+                b += 1;
+                continue;
+            }else if !sign && (bs[b] == b'+' || bs[b] == b'-') {
+                is_negative = match bs[b] {
+                    b'-' => { sign = true;true },
+                    b'+' => { sign = true;false },
+                    _ => false,
+                };
+                b += 1;
+                continue;
+            }else{
+                break;
+            }
+
+            b += 1;
+        }
+
+        if is_negative { -res } else { res }
+    }
+    pub fn test()
+    {
+        println!("res  = {}",my_atoi("+1".to_string()));
+    }
+}
 fn main() {
 //    if cfg!(target_os = "windows") {
 ////        t14::test();
 ////    }
-    t19::test();
+    t20::test();
 }
