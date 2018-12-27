@@ -931,6 +931,66 @@ mod t19{
 
 mod t20{
 
+    /*
+    leetcode 通过 例子
+    impl Solution {
+        pub fn my_atoi(str: String) -> i32 {
+            if str.len() == 0 {return 0;}
+            let mut sign = false;
+            let bs = str.as_bytes();
+            let mut b = 0;
+            let mut is_negative = match bs[0] {
+                b'-' => { sign = true;b += 1;true },
+                b'+' => { sign = true;b += 1;false },
+                _ => false,
+            };
+            let mut a_c = false;
+
+            let mut res:u128 = 0;
+
+            loop{
+                if b >= str.len(){break;}
+
+                if bs[b] >= 48 && bs[b] <= 57{
+                    a_c = true;
+                    let zl = (bs[b] - 48) as u128;
+                    res *= 10;
+                    res += zl;
+                }else if !a_c && bs[b] == b' '{
+                    if sign {break;}
+                    b += 1;
+                    continue;
+                }else if !a_c && !sign && (bs[b] == b'+' || bs[b] == b'-') {
+                    is_negative = match bs[b] {
+                        b'-' => { sign = true;true },
+                        b'+' => { sign = true;false },
+                        _ => false,
+                    };
+                    b += 1;
+                    continue;
+                }else{
+                    break;
+                }
+
+                b += 1;
+            }
+            if is_negative {
+                if res > 2147483648{
+                    -2147483648i32
+                }else{
+                    0 - (res as i32)
+                }
+            } else {
+                if res > 0x7FFFFFFF{
+                    0x7FFFFFFFi32
+                }else{
+                    res as i32
+                }
+            }
+        }
+    }
+    (和下面的不一样) ⇩
+    */
     fn my_atoi(str: String) -> i32 {
         if str.len() == 0 {return 0;}
         let mut sign = false;
@@ -942,17 +1002,14 @@ mod t20{
             _ => false,
         };
 
-        let mut res = 0;
+        let mut res:u64 = 0;
 
         loop{
             if b >= str.len(){break;}
 
             if bs[b] >= 48 && bs[b] <= 57{
-                let zl = (bs[b] - 48) as i32;
-                if (res * 10) - res < 0 || res * 10 < 0{ return -2147483648i32;}
+                let zl = (bs[b] - 48) as u64;
                 res *= 10;
-
-                if (res + zl) - res < 0 || res + zl < 0 { return -2147483648i32;}//0x7FFF_FFFF
                 res += zl;
             }else if bs[b] == b' '{
                 if sign {break;}
@@ -972,11 +1029,23 @@ mod t20{
 
             b += 1;
         }
-
-        if is_negative { -res } else { res }
+        if is_negative {
+            if res > 2147483648{
+                -2147483648i32
+            }else{
+                0 - (res as i32)
+            }
+        } else {
+            if res > 0x7FFFFFFF{
+                0x7FFFFFFFi32
+            }else{
+                res as i32
+            }
+        }
     }
     pub fn test()
     {
+        println!("res  = {}",my_atoi("0-1".to_string()));
         println!("res  = {}",my_atoi("+1".to_string()));
     }
 }
