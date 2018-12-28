@@ -1049,9 +1049,53 @@ mod t20{
         println!("res  = {}",my_atoi("+1".to_string()));
     }
 }
+
+mod t21{
+
+    fn is_palindrome(x: i32) -> bool {
+        if x < 0{return false;}
+        let mut x = x;
+        let mut res = true;
+        let mut len = 0;
+        let mut nums = Vec::new();
+        while x > 0{
+            let n = x % 10;
+            nums.push(n);
+            x /= 10;
+        }
+        len = nums.len() / 2;
+        for n in 0..len{
+            let other = nums.len() - 1 - n;
+            if nums[n] != nums[other]{
+                res = false;
+            }
+        }
+        res
+    }
+
+    fn is_palindrome2(x:i32) -> bool
+    {
+        let mut r = 0;
+        let mut y = x;
+
+        if x < 0 || (x != 0 &&x % 10 == 0){
+            return false;
+        }
+        while y > r{
+            r = r*10 + y%10;
+            y /= 10;
+        }
+        y == r || y== r/10
+    }
+
+    pub fn test()
+    {
+        is_palindrome(12345);
+    }
+}
 fn main() {
 //    if cfg!(target_os = "windows") {
 ////        t14::test();
 ////    }
-    t20::test();
+    t21::test();
 }
