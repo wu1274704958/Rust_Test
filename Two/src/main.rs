@@ -1093,9 +1093,88 @@ mod t21{
         is_palindrome(12345);
     }
 }
+
+mod t22{
+
+    use std::collections::HashMap;
+
+    fn is_match(s: String, p: String) -> bool {
+        let str = s.as_bytes();
+        let pat = p.as_bytes();
+        let mut res = true;
+        let mut i = 0usize;
+
+        let mut last = 0u8;
+
+        if str.len() == 0{
+            if p.len() % 2 != 0{ return false; }
+            if p.len() == 0 { return true; }
+
+            let mut j = 1;
+            loop{
+                if j >= p.len(){ break;}
+                if pat[j] != b'*' {return false;}
+                j += 2;
+            }
+            return true;
+        }
+
+        for n in 0..pat.len(){
+
+            if i >= str.len() {
+                return false;
+            }
+
+            let it = pat[n];
+            let next = if n == pat.len() - 1{
+                0
+            }else{
+                pat[n + 1]
+            };
+            match it {
+                b'a'..=b'z' => {
+                    if next != b'*'{
+                        if str[i] != it{
+                            return false;
+                        }else{
+                            i += 1;
+                        }
+                    }else{
+                        last = it;
+                    }
+                },
+                b'.' => {
+                    if next != b'*'{
+                        i += 1;
+                    }else{
+                        last = it;
+                    }
+                },
+                b'*' => {
+                    //....
+                },
+                _ =>{ }
+            }
+        }
+        if i < str.len() { return false; }
+        res
+    }
+
+    pub fn test()
+    {
+        //println!("{}",is_match("aa".to_string(),"a*".to_string()));
+
+        println!("{}",is_match("aaa".to_string(),"a*a".to_string()));
+        //println!("{}",is_match("mississippi".to_string(),"mis*is*p*.".to_string()));
+        //println!("{}",is_match("".to_string(),"a".to_string()));
+        //println!("{}",is_match("aaa".to_string(),"ab*a*c*a".to_string()));
+
+    }
+}
+
 fn main() {
 //    if cfg!(target_os = "windows") {
 ////        t14::test();
 ////    }
-    t21::test();
+    t22::test();
 }
