@@ -1097,6 +1097,39 @@ mod t21{
 mod t22{
 
     use std::collections::HashMap;
+    #[inline]
+    fn max_match_num(str :&[u8],len:usize,mc:u8,mut i:usize)->usize{
+        if mc == b'.'{
+            return len - i;
+        }
+        let b = i;
+        while i < len && str[i] == mc  {
+            i += 1;
+        }
+        i - b
+    }
+    #[inline]
+    fn has_other_match(mmn_map:&HashMap<usize,(usize,usize,usize)>) -> Option<(usize,usize)>
+    {
+        let mut res:Option<(usize,usize)> = None;
+        mmn_map.iter().for_each(|it|{
+            if (it.1).0 > 0{
+                res = Some((it.0.clone(),(it.1).1.clone()));
+            }
+        });
+        res
+    }
+
+    #[inline]
+    fn rest_mmn(mmn_map:& mut HashMap<usize,(usize,usize,usize)>)
+    {
+        mmn_map.iter_mut().for_each(|it|{
+            let mut v = it.1;
+            if (*v).0 == 0{
+                (*v).0 = v.2;
+            }
+        });
+    }
 
     fn is_match(s: String, p: String) -> bool {
         let str = s.as_bytes();
@@ -1119,44 +1152,95 @@ mod t22{
             return true;
         }
 
-        for n in 0..pat.len(){
+        let mut mmn_map:HashMap<usize,(usize,usize,usize)> = HashMap::new();
+        let mut n = 0;
 
-            if i >= str.len() {
-                return false;
+        while true {
+
+            loop {
+                if n >= p.len() {
+                    if i < str.len() { res = false; }
+                    break;
+                }
+                if i >= str.len() {
+                    if n + 1 < p.len() && pat[n + 1] == b'*' && n + 1 == p.len() - 1{
+                        res = true;
+                        break;
+                    }
+                    res = false;
+                    break;
+                }
+
+                let it = pat[n];
+                let next = if n == pat.len() - 1 {
+                    0
+                } else {
+                    pat[n + 1]
+                };
+                match it {
+                    b'a'..=b'z' => {
+                        if next != b'*' {
+                            println!("a-z {} {} ",str[i],it);
+                            if str[i] != it {
+                                res = false;
+                                break;
+                            } else {
+                                i += 1;
+                            }
+                        } else {
+                            last = it;
+                        }
+                    },
+                    b'.' => {
+                        println!(". {}",str[i]);
+                        if next != b'*' {
+                            i += 1;
+                        } else {
+                            last = it;
+                        }
+                    },
+                    b'*' => {
+                        //....
+                        println!("* {}",last);
+                        let mut mmn = if mmn_map.contains_key(&n) {
+                            let mut temp = mmn_map.get(&n).unwrap().clone();
+                            if temp.0 > 0 { temp.0 -= 1;}
+                            temp.1 = i;
+                            temp
+                        } else {
+                            let max_match_n = max_match_num(str, s.len(), last, i);
+                            let temp = (max_match_n, i,max_match_n);
+                            mmn_map.insert(n, temp);
+                            temp
+                        };
+                        println!("n={} mmn={:?}", n, mmn);
+                        if mmn.0 > 0 {
+                            rest_mmn(&mut mmn_map);
+                            mmn_map.insert(n, mmn);
+
+                            i += mmn.0;
+                        }else{
+                            mmn_map.insert(n, mmn);
+                        }
+                    },
+                    _ => {}
+                }
+                n += 1;
             }
 
-            let it = pat[n];
-            let next = if n == pat.len() - 1{
-                0
+            let hom = has_other_match(&mmn_map);
+            println!("hom = {:?} i = {} n = {}",hom,i,n);
+            if let Some(n_i) = hom {
+                if res {break ;}
+                n = n_i.0;
+                i = n_i.1;
+                last = pat[n - 1];
+                res = true;
             }else{
-                pat[n + 1]
-            };
-            match it {
-                b'a'..=b'z' => {
-                    if next != b'*'{
-                        if str[i] != it{
-                            return false;
-                        }else{
-                            i += 1;
-                        }
-                    }else{
-                        last = it;
-                    }
-                },
-                b'.' => {
-                    if next != b'*'{
-                        i += 1;
-                    }else{
-                        last = it;
-                    }
-                },
-                b'*' => {
-                    //....
-                },
-                _ =>{ }
+                break;
             }
         }
-        if i < str.len() { return false; }
+
         res
     }
 
@@ -1164,10 +1248,20 @@ mod t22{
     {
         //println!("{}",is_match("aa".to_string(),"a*".to_string()));
 
-        println!("{}",is_match("aaa".to_string(),"a*a".to_string()));
+        //println!("{}",is_match("aaa".to_string(),"a*a".to_string()));
         //println!("{}",is_match("mississippi".to_string(),"mis*is*p*.".to_string()));
+        //println!("{}",is_match("ab".to_string(),".*".to_string()));
+        //println!("{}",is_match("ab".to_string(),".*c".to_string()));
+        //println!("{}",is_match("a".to_string(),"ab*".to_string()));
         //println!("{}",is_match("".to_string(),"a".to_string()));
         //println!("{}",is_match("aaa".to_string(),"ab*a*c*a".to_string()));
+        //println!("{}",is_match("abc".to_string(),"ab*c*d*".to_string()));
+        //println!("{}",is_match("bbbba".to_string(),".*a*a".to_string()));
+        //println!("{}",is_match("aasdfasdfasdfasdfas".to_string(),"aasdf.*asdf.*asdf.*asdf.*s".to_string()));
+        println!("{}",is_match("baabbbaccbccacacc".to_string(),"c*..b*a*a.*a..*c".to_string()));
+
+
+
 
     }
 }
