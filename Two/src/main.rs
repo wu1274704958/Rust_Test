@@ -1156,7 +1156,7 @@ mod t22{
         let mut n = 0;
 
         while true {
-
+        println!("--------------------------------------------");
             loop {
                 if n >= p.len() {
                     if i < str.len() { res = false; }
@@ -1180,7 +1180,7 @@ mod t22{
                 match it {
                     b'a'..=b'z' => {
                         if next != b'*' {
-                            println!("a-z {} {} ",str[i],it);
+                            println!("a-z {} {} ",str[i] as char,it as char);
                             if str[i] != it {
                                 res = false;
                                 break;
@@ -1192,7 +1192,7 @@ mod t22{
                         }
                     },
                     b'.' => {
-                        println!(". {}",str[i]);
+                        println!(". {}",str[i] as char);
                         if next != b'*' {
                             i += 1;
                         } else {
@@ -1201,7 +1201,7 @@ mod t22{
                     },
                     b'*' => {
                         //....
-                        println!("* {}",last);
+                        println!("* {}",last as char);
                         let mut mmn = if mmn_map.contains_key(&n) {
                             let mut temp = mmn_map.get(&n).unwrap().clone();
                             if temp.0 > 0 { temp.0 -= 1;}
@@ -1227,7 +1227,7 @@ mod t22{
                 }
                 n += 1;
             }
-
+            println!("================================================");
             let hom = has_other_match(&mmn_map);
             println!("hom = {:?} i = {} n = {}",hom,i,n);
             if let Some(n_i) = hom {
@@ -1259,8 +1259,9 @@ mod t22{
         //println!("{}",is_match("bbbba".to_string(),".*a*a".to_string()));
         //println!("{}",is_match("aasdfasdfasdfasdfas".to_string(),"aasdf.*asdf.*asdf.*asdf.*s".to_string()));
         println!("{}",is_match("baabbbaccbccacacc".to_string(),"c*..b*a*a.*a..*c".to_string()));
-
-
+        //  ba    a bbbac cbccacacc
+        //c*..b*a*a .* a. .*      c
+        //012345678 90 12 34      5
 
 
     }
