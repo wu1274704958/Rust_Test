@@ -1096,7 +1096,7 @@ mod t21{
 
 mod t22{
 
-    use std::collections::HashMap;
+    use std::collections::BTreeMap;
     #[inline]
     fn max_match_num(str :&[u8],len:usize,mc:u8,mut i:usize)->usize{
         if mc == b'.'{
@@ -1109,10 +1109,11 @@ mod t22{
         i - b
     }
     #[inline]
-    fn has_other_match(mmn_map:&HashMap<usize,(usize,usize,usize)>) -> Option<(usize,usize)>
+    fn has_other_match(mmn_map:&BTreeMap<usize,(usize,usize,usize)>) -> Option<(usize,usize)>
     {
         let mut res:Option<(usize,usize)> = None;
         mmn_map.iter().for_each(|it|{
+            //println!("-- {}",it.0);
             if (it.1).0 > 0{
                 res = Some((it.0.clone(),(it.1).1.clone()));
             }
@@ -1121,7 +1122,7 @@ mod t22{
     }
 
     #[inline]
-    fn rest_mmn(mmn_map:& mut HashMap<usize,(usize,usize,usize)>)
+    fn rest_mmn(mmn_map:& mut BTreeMap<usize,(usize,usize,usize)>)
     {
         mmn_map.iter_mut().for_each(|it|{
             let mut v = it.1;
@@ -1152,7 +1153,7 @@ mod t22{
             return true;
         }
 
-        let mut mmn_map:HashMap<usize,(usize,usize,usize)> = HashMap::new();
+        let mut mmn_map:BTreeMap<usize,(usize,usize,usize)> = BTreeMap::new();
         let mut n = 0;
 
         while true {
@@ -1192,8 +1193,8 @@ mod t22{
                         }
                     },
                     b'.' => {
-                        println!(". {}",str[i] as char);
                         if next != b'*' {
+                            println!(". {}",str[i] as char);
                             i += 1;
                         } else {
                             last = it;
@@ -1258,12 +1259,14 @@ mod t22{
         //println!("{}",is_match("abc".to_string(),"ab*c*d*".to_string()));
         //println!("{}",is_match("bbbba".to_string(),".*a*a".to_string()));
         //println!("{}",is_match("aasdfasdfasdfasdfas".to_string(),"aasdf.*asdf.*asdf.*asdf.*s".to_string()));
-        println!("{}",is_match("baabbbaccbccacacc".to_string(),"c*..b*a*a.*a..*c".to_string()));
+        //println!("{}",is_match("baabbbaccbccacacc".to_string(),"c*..b*a*a.*a..*c".to_string()));
         //  ba    a bbbac cbccacacc
         //c*..b*a*a .* a. .*      c
         //012345678 90 12 34      5
-
-
+        println!("{}",is_match("abcaaaaaaabaabcabac".to_string(),".*ab.a.*a*a*.*b*b*".to_string()));
+        //abcaaaaaaabaabcabac
+        //.*ab.a.*a*a*.*b*b*
+        //123456789012345678
     }
 }
 
