@@ -1158,17 +1158,24 @@ mod t22{
 
         while true {
         println!("--------------------------------------------");
-            loop {
+             loop {
                 if n >= p.len() {
                     if i < str.len() { res = false; }
                     break;
                 }
                 if i >= str.len() {
-                    if n + 1 < p.len() && pat[n + 1] == b'*' && n + 1 == p.len() - 1{
-                        res = true;
-                        break;
+                    let mut temp_n = n + 1;
+                    let mut temp_res = true;
+                    if p.len() - n % 2 != 0 { res = false;break; }
+                    loop{
+                        if temp_n >= p.len() { break; }
+                        if pat[temp_n] != b'*'{
+                            temp_res = false;
+                            break;
+                        }
+                        temp_n += 2;
                     }
-                    res = false;
+                    res = temp_res;
                     break;
                 }
 
