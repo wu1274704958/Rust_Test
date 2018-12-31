@@ -1157,7 +1157,7 @@ mod t22{
         let mut n = 0;
 
         while true {
-        println!("--------------------------------------------");
+        //println!("--------------------------------------------");
              loop {
                 if n >= p.len() {
                     if i < str.len() { res = false; }
@@ -1166,7 +1166,7 @@ mod t22{
                 if i >= str.len() {
                     let mut temp_n = n + 1;
                     let mut temp_res = true;
-                    if p.len() - n % 2 != 0 { res = false;break; }
+                    if (p.len() - n) % 2 != 0 { res = false;break; }
                     loop{
                         if temp_n >= p.len() { break; }
                         if pat[temp_n] != b'*'{
@@ -1188,7 +1188,7 @@ mod t22{
                 match it {
                     b'a'..=b'z' => {
                         if next != b'*' {
-                            println!("a-z {} {} ",str[i] as char,it as char);
+                            //println!("a-z {} {} ",str[i] as char,it as char);
                             if str[i] != it {
                                 res = false;
                                 break;
@@ -1201,7 +1201,7 @@ mod t22{
                     },
                     b'.' => {
                         if next != b'*' {
-                            println!(". {}",str[i] as char);
+                            //println!(". {}",str[i] as char);
                             i += 1;
                         } else {
                             last = it;
@@ -1209,9 +1209,14 @@ mod t22{
                     },
                     b'*' => {
                         //....
-                        println!("* {}",last as char);
+                        //println!("* {}",last as char);
                         let mut mmn = if mmn_map.contains_key(&n) {
                             let mut temp = mmn_map.get(&n).unwrap().clone();
+                            if i != temp.1 {
+                                let max_match_n = max_match_num(str, s.len(), last, i);
+                                temp.2 = max_match_n;
+                                temp.0 = 0;
+                            }
                             if temp.0 > 0 { temp.0 -= 1;}
                             temp.1 = i;
                             temp
@@ -1221,7 +1226,7 @@ mod t22{
                             mmn_map.insert(n, temp);
                             temp
                         };
-                        println!("n={} mmn={:?}", n, mmn);
+                        //println!("n={} mmn={:?}", n, mmn);
                         if mmn.0 > 0 {
                             rest_mmn(&mut mmn_map);
                             mmn_map.insert(n, mmn);
@@ -1235,9 +1240,9 @@ mod t22{
                 }
                 n += 1;
             }
-            println!("================================================");
+            //println!("================================================");
             let hom = has_other_match(&mmn_map);
-            println!("hom = {:?} i = {} n = {}",hom,i,n);
+            //println!("hom = {:?} i = {} n = {}",hom,i,n);
             if let Some(n_i) = hom {
                 if res {break ;}
                 n = n_i.0;
@@ -1254,19 +1259,19 @@ mod t22{
 
     pub fn test()
     {
-        //println!("{}",is_match("aa".to_string(),"a*".to_string()));
+        println!("{}",is_match("aa".to_string(),"a*".to_string()));
 
-        //println!("{}",is_match("aaa".to_string(),"a*a".to_string()));
-        //println!("{}",is_match("mississippi".to_string(),"mis*is*p*.".to_string()));
-        //println!("{}",is_match("ab".to_string(),".*".to_string()));
-        //println!("{}",is_match("ab".to_string(),".*c".to_string()));
-        //println!("{}",is_match("a".to_string(),"ab*".to_string()));
-        //println!("{}",is_match("".to_string(),"a".to_string()));
-        //println!("{}",is_match("aaa".to_string(),"ab*a*c*a".to_string()));
-        //println!("{}",is_match("abc".to_string(),"ab*c*d*".to_string()));
-        //println!("{}",is_match("bbbba".to_string(),".*a*a".to_string()));
-        //println!("{}",is_match("aasdfasdfasdfasdfas".to_string(),"aasdf.*asdf.*asdf.*asdf.*s".to_string()));
-        //println!("{}",is_match("baabbbaccbccacacc".to_string(),"c*..b*a*a.*a..*c".to_string()));
+        println!("{}",is_match("aaa".to_string(),"a*a".to_string()));
+        println!("{}",is_match("mississippi".to_string(),"mis*is*p*.".to_string()));
+        println!("{}",is_match("ab".to_string(),".*".to_string()));
+        println!("{}",is_match("ab".to_string(),".*c".to_string()));
+        println!("{}",is_match("a".to_string(),"ab*".to_string()));
+        println!("{}",is_match("".to_string(),"a".to_string()));
+        println!("{}",is_match("aaa".to_string(),"ab*a*c*a".to_string()));
+        println!("{}",is_match("abc".to_string(),"ab*c*d*".to_string()));
+        println!("{}",is_match("bbbba".to_string(),".*a*a".to_string()));
+        println!("{}",is_match("aasdfasdfasdfasdfas".to_string(),"aasdf.*asdf.*asdf.*asdf.*s".to_string()));
+        println!("{}",is_match("baabbbaccbccacacc".to_string(),"c*..b*a*a.*a..*c".to_string()));
         //  ba    a bbbac cbccacacc
         //c*..b*a*a .* a. .*      c
         //012345678 90 12 34      5
@@ -1274,6 +1279,19 @@ mod t22{
         //abcaaaaaaabaabcabac
         //.*ab.a.*a*a*.*b*b*
         //123456789012345678
+        println!("{}",is_match("aabccbcbacabaab".to_string(),".*c*a*b.*a*ba*bb*".to_string()));
+        //0123456        7 89  0  1 23 4
+        //aabccbc        b ac  a  b aa b
+        //.*      c*a*   b .*  a* b a* b b*
+        //01      2345   6 78  90 1 23 4 56
+        // 7       0 0      2   1    2    0
+
+        println!("{}",is_match("bcbacacbacbbbbcac".to_string(),"..*a*a*b*c*.*a*bb*.".to_string()));
+
+        //b cbacacbacbbb     b c  a          c
+        //. .*           a*a*b*c* .* a* b b* .
+        //0 12           34567890 12 34 5 67 8
+        //
     }
 }
 
