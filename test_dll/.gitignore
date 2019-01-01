@@ -11,3 +11,7 @@ build/x64-Release/*.ilk
 build/x64-Release/*.pdb
 build/x64-Release/*.ninja_log
 build/x64-Release/*.ninja_deps
+build/*.txt
+build/*.cmake
+build/Makefile
+build/CMakeFiles/*

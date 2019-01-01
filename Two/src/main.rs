@@ -1296,8 +1296,8 @@ mod t22{
 }
 
 fn main() {
-//    if cfg!(target_os = "windows") {
-////        t14::test();
-////    }
-    t22::test();
+   if cfg!(target_os = "windows") {
+        t14::test();
+    }
+    //t22::test();
 }
