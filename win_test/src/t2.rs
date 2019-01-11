@@ -230,6 +230,7 @@ pub fn test()
     });
 
     let mut from:Vec<Vec2> = Vec::new();
+    let max_len = 60usize;
 
     for i in 0..sys_lv.size(){
         from.push(sys_lv.get_item_pos_center(i as usize).ok().unwrap().into());
@@ -238,13 +239,13 @@ pub fn test()
     let len = n_for_time as usize;
     if !ONE_BY_ONE {
         'wai:loop {
-            if b >= sys_lv.size() as usize { break; }
+            if b >= max_len as usize { break; }
                 for n in tween_vec.iter() {
                     let mut i = 0;
                     loop {
                         if i >= len { break; }
                         let curr = b + i;
-                        if curr >= sys_lv.size() as usize { break; }
+                        if curr >= max_len as usize { break; }
                         let offset = points[curr] - from[curr];
                         sys_lv.set_item_pos_center(curr, (from[curr].x + (offset.x * n.y)) as i32, (from[curr].y + (offset.y * n.y)) as i32);
                         i += 1;
@@ -255,7 +256,7 @@ pub fn test()
         }
 
     }else{
-        for i in 0..sys_lv.size() as usize {
+        for i in 0..max_len {
             let offset = points[i] - from[i];
             for n in tween_vec.iter() {
                 sys_lv.set_item_pos_center(i, (from[i].x + (offset.x * n.y)) as i32, (from[i].y + (offset.y * n.y)) as i32);
@@ -322,6 +323,7 @@ pub fn load_config() -> Option<(Vec<Vec2>,Vec<String>)>
                             1 => {
                                 let arr1: Vec<&str> = it.split("=").collect();
                                 let index = usize::from_str(arr1[0]).unwrap();
+                                if index >= pos.len() { pos.push(Vec2::new(0.0f32,0.0f32)); }
                                 let arr2: Vec<&str> = arr1[1].split(",").collect();
                                 let x = i32::from_str(arr2[0]).unwrap();
                                 let y = i32::from_str(arr2[1]).unwrap();
