@@ -1295,9 +1295,32 @@ mod t22{
     }
 }
 
-fn main() {
-   if cfg!(target_os = "windows") {
-        t14::test();
+// https://leetcode-cn.com/problems/container-with-most-water/
+mod t23{
+    use std::cmp::min;
+
+    fn max_area(height: Vec<i32>) -> i32 {
+        let mut res = 0;
+        let mut j = 0usize;
+        let mut i = height.len() - 1;
+        while j < i {
+            let t = (i - j) as i32 * min(height[i],height[j]);
+            if t > res { res = t; }
+            if height[j] > height[i]{ i -= 1; }else { j += 1; }
+        }
+        res
     }
-    //t22::test();
+
+    pub fn test()
+    {
+        assert_eq!(49, max_area(vec![1,8,6,2,5,4,8,3,7]));
+        assert_eq!(188, max_area(vec![15,89,151,545,45,47,7,8,21,0]));
+    }
+}
+
+fn main() {
+//    if cfg!(target_os = "windows") {
+//        t14::test();
+//    }
+    t23::test();
 }
