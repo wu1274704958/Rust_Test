@@ -1346,9 +1346,53 @@ mod t24{
     }
 }
 
+mod t25{
+    type RomanSymbol = (&'static str,i32);
+    fn roman_to_int(s: String) -> i32{
+        let rs_arr:[RomanSymbol;13] = [ ("M",1000),("CM",900),("D",500,),("CD",400),("C",100),("XC",90),("L",50),("XL",40),("X",10),("IX",9),("V",5),("IV",4),("I",1) ];
+
+        let mut res = 0;
+        let mut i = 0usize;
+        let mut s = s.as_bytes();
+        let mut j = 0;
+        loop{
+            if j >= s.len() { break; }
+//            dbg!(i);
+//            dbg!(j);
+            if i % 2 == 0 {
+                if rs_arr[i].0.as_bytes()[0] == s[j]
+                {
+                    res += rs_arr[i].1;
+                    j += 1;
+                }else{
+                    i += 1;
+                }
+            }else{
+                if j + 1 >= s.len() { i += 1; }
+                else if rs_arr[i].0.as_bytes()[0] == s[j] && rs_arr[i].0.as_bytes()[1] == s[j + 1]
+                {
+                    res += rs_arr[i].1;
+                    j += 2;
+                }else{
+                    i += 1;
+                }
+            }
+        }
+        res
+    }
+
+    pub fn test()
+    {
+        assert_eq!(1994, roman_to_int("MCMXCIV".to_string()) );
+        assert_eq!(58 , roman_to_int("LVIII".to_string()) );
+        assert_eq!(3999, roman_to_int("MMMCMXCIX".to_string()) );
+        assert_eq!(621, roman_to_int("DCXXI".to_string()) );
+    }
+}
+
 fn main() {
 //    if cfg!(target_os = "windows") {
 //        t14::test();
 //    }
-    t24::test();
+    t25::test();
 }
