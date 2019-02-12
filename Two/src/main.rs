@@ -1317,10 +1317,38 @@ mod t23{
         assert_eq!(188, max_area(vec![15,89,151,545,45,47,7,8,21,0]));
     }
 }
+//12 整数转罗马数字    
+mod t24{
+    type RomanSymbol = (i32,&'static str);
+
+    fn int_to_roman(num: i32) -> String {
+        let rs_arr:[RomanSymbol;13] = [ (1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC"),(50,"L"),(40,"XL"),(10,"X"),(9,"IX"),(5,"V"),(4,"IV"),(1,"I") ];
+        let mut res = String::new();
+        let mut i = 0usize;
+        let mut n = num;
+        while n > 0 {
+            if n >= rs_arr[i].0{
+                res.push_str(rs_arr[i].1);
+//                dbg!(n);
+//                dbg!(rs_arr[i]);
+                n -= rs_arr[i].0;
+            }else{
+                i += 1;
+            }
+        }
+        res
+    }
+
+    pub fn test(){
+        assert_eq!("MCMXCIV".to_string(), int_to_roman(1994) );
+        assert_eq!("LVIII".to_string(), int_to_roman(58) );
+        assert_eq!("MMMCMXCIX".to_string(), int_to_roman(3999) );
+    }
+}
 
 fn main() {
 //    if cfg!(target_os = "windows") {
 //        t14::test();
 //    }
-    t23::test();
+    t24::test();
 }
