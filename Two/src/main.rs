@@ -1390,9 +1390,54 @@ mod t25{
     }
 }
 
+mod t26{
+    use std::i32;
+    fn three_sum_closest(nums: Vec<i32>, target: i32) -> i32 {
+        let mut arr = nums;
+
+        arr.sort();
+        let mut res:i32 = arr[0] + arr[1] + arr[2];
+        let mut i = 0usize;
+        loop{
+            if i >= arr.len() - 2 {
+                break;
+            }
+            let mut b = i + 1;
+            let mut e = arr.len() - 1;
+            while e > b {
+
+                dbg!((i,b,e,res));
+
+                let mut temp_sum = arr[i] + arr[b] + arr[e];
+
+                if dbg!((res - target).abs() > (temp_sum - target).abs())
+                {
+                    res = temp_sum;
+                }
+
+                if target > temp_sum{
+                    b += 1;
+                }else if target < temp_sum{
+                    e -= 1;
+                }else {
+                    return temp_sum;
+                }
+            }
+            i += 1;
+        }
+        res
+    }
+
+    pub fn test()
+    {
+        dbg!( three_sum_closest(vec![-1,2,1,-4] ,1) ); // -4 -1 1 2
+        dbg!( three_sum_closest(vec![0,2,1,-3],1) ); // -3 0 1 2
+    }
+}
+
 fn main() {
 //    if cfg!(target_os = "windows") {
 //        t14::test();
 //    }
-    t25::test();
+    t26::test();
 }
