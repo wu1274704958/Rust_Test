@@ -1435,9 +1435,36 @@ mod t26{
     }
 }
 
+mod t27{
+    fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+
+        if nums.is_empty() || nums.len() < 4{
+            return vec![];
+        }
+
+        let mut res:Vec<Vec<i32>> = vec![];
+        let mut nums = nums;
+
+        nums.sort();
+
+
+        res
+    }
+
+    pub fn test()
+    {
+        dbg!(four_sum(vec![1, 0, -1, 0, -2, 2],0));
+        dbg!(four_sum(vec![-3,-2,-1,0,0,1,2,3],0));  // 少 -2,-1,1,2  // 重复 -3,0,1,2
+        //   i      j       b       e
+        //   -2     -1      0       3       0
+
+        //   -3     0       1       2
+    }
+}
+
 fn main() {
 //    if cfg!(target_os = "windows") {
 //        t14::test();
 //    }
-    t26::test();
+    t27::test();
 }
