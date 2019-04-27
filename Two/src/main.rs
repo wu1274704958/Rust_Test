@@ -1438,15 +1438,39 @@ mod t26{
 mod t27{
     fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
 
-        if nums.is_empty() || nums.len() < 4{
+        if nums.len() < 4{
             return vec![];
         }
 
         let mut res:Vec<Vec<i32>> = vec![];
         let mut nums = nums;
-
+        let n  = nums.len();
         nums.sort();
-
+        for i in 0..n - 3{
+            if i > 0 && nums[i] == nums[i - 1]{ continue;}
+            for j in i+1..n - 2{
+                if j > i + 1 && nums[j] == nums[j - 1]{continue;}
+                let mut b = j + 1;
+                let mut e = n - 1;
+                while b < e{
+                    let sum = nums[i] + nums[j] + nums[b] + nums[e];
+                    if target == sum{
+                        res.push(vec![nums[i] , nums[j] , nums[b] , nums[e]]);
+                        while b < e && nums[b] == nums[b + 1] {
+                            b += 1;
+                        }
+                        while b < e && nums[e] == nums[e - 1] {
+                            e -= 1;
+                        }
+                        b += 1;e -= 1;
+                    }else if sum > target{
+                        e -= 1;
+                    }else{
+                        b += 1;
+                    }
+                }
+            }
+        }
 
         res
     }
