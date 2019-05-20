@@ -85,7 +85,7 @@ pub fn test()
 
     let config = load_config();
 
-    let sys_lv = SysLv::new();
+    let mut sys_lv = SysLv::new();
 
     if only_reduction && only_del{
         if let Some(config) = config {
@@ -275,7 +275,8 @@ pub fn test()
 
     save_config(Some(_itemStateStore.get_pervious()),&fs);
 
-    sleep(Duration::from_secs(2));
+    sleep(Duration::from_secs(4));
+    unsafe{ (*sys_lv.as_ptr()).refresh_num();}
 
 }
 
