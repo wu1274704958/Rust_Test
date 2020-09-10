@@ -236,5 +236,5 @@ fn test4(){
 }
 
 fn main() {
-    test4();
+    test3();
 }
