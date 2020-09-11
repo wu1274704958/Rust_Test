@@ -12,7 +12,8 @@ def_const!{a6 => 1.26f32}
 def_const!{a7 => 1.909090f64}
 def_const!{a8 => 1.90}
 def_const!{a9 => 2131287391289389865556.1415926765342908192f64}
-
+def_const!{wechat => "wechat"encode_s }
+def_const!{alipay => "alipay"encode_s }
 fn main()
 {
     dbg!(a1);
@@ -22,4 +23,6 @@ fn main()
     dbg!(a7);
     dbg!(a8);
     dbg!(a9);
+    dbg!(wechat);
+    dbg!(alipay);
 }
