@@ -22,7 +22,7 @@ pub fn simple_encode(v:*const c_char,out:*mut c_char)
         let in_str = CStr::from_ptr(v).to_str().unwrap();
         let res = Simple::encode(in_str);
         let data = res.as_bytes();
-        copy(data.as_ptr() as *const i8,out,data.len());
+        copy(data.as_ptr() as *const i8,out as *mut i8,data.len());
     }
 }
 
@@ -33,6 +33,6 @@ pub fn simple_decode(v:*const c_char,out:*mut c_char)
         let in_str = CStr::from_ptr(v).to_str().unwrap();
         let res = Simple::decode(in_str);
         let data = res.as_bytes();
-        copy(data.as_ptr() as *const i8,out,data.len());
+        copy(data.as_ptr() as *const i8,out as *mut i8,data.len());
     }
 }
