@@ -4,4 +4,6 @@
 *.iml
 /test1/target
 /pm2/target
+/encryption/target
+/c_encryption/target
 
