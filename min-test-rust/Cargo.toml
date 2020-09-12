@@ -7,6 +7,7 @@ authors = ["wusj7856 <wusj@realbull.net>"]
 [dependencies]
 test1 = { path="./test1"}
 pm2 = {path="./pm2"}
+encryption = {path="./encryption"}
 
 [[example]]
 name = "t_pm2"

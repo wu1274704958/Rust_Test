@@ -1,8 +1,8 @@
 extern crate proc_macro;
 extern crate syn;
+extern crate encryption;
 #[macro_use]
 mod macros;
-mod encryption;
 
 use encryption::Simple;
 
